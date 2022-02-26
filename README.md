@@ -4,7 +4,7 @@ A program for performing checks on, and enhancing, my markdown notes.
 
 ## Design
 
-Could use Golang as a language for this. Golang has a library (see [here](https://github.com/yuin/goldmark)) for parsing Markdown as an abstract syntax tree, the only problem is that the notes have to be formatted in CommonMark (whereas I am currently using Pandoc-flavoured Markdown).
+Could use Golang as a language for this. Golang has a library (see [here](https://github.com/yuin/goldmark)) for parsing Markdown as an abstract syntax tree, the only problem is that the notes have to be formatted in CommonMark (whereas I am currently using Pandoc-flavoured Markdown). **If Golang doesn't seem right, there are [other options](https://github.com/commonmark/commonmark-spec/wiki/List-of-CommonMark-Implementations)**.
 
 The name of the project ('janitor') is inspired by the ['note-link-janitor'](https://github.com/andymatuschak/note-link-janitor) by Andy Matuschak. I would prefer to just use his implementation over writing an entirely new one for myself, but his implementation wouldn't work for my notes as it assumes that you are using Wiki links to join your notes together (but I don't do that, I use plain markdown notes like this: `[]()`)
 
