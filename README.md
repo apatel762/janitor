@@ -16,7 +16,7 @@ The execution stage will read the index into memory and do things to the notes b
 
 Every hook is applied sequentially to a note to fully process that note before moving to the next (pseudocode below):
 
-```
+```python
 for note in notes:
     for hook in hooks:
         hook.apply(note)
