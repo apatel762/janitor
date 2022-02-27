@@ -2,28 +2,21 @@
 
 A program for performing checks on, and enhancing, my markdown notes.
 
-The name of the project ('janitor') is inspired by the ['note-link-janitor'](https://github.com/andymatuschak/note-link-janitor) by Andy Matuschak. I can't use his implementation directly as his only supports Wikilinks. **There is a [fork](https://github.com/sjmarshy/note-link-janitor) of the program that supports normal Markdown links**, but I'm hesitant to just use that as-is because I don't really understand what the code is doing, and I'm not confident that I could maintain it myself if I had to.
+The name of the project ('janitor') is inspired by the ['note-link-janitor'](https://github.com/andymatuschak/note-link-janitor) by Andy Matuschak. I'm using this repo to maintain my own version of his scripts because I want to support regular markdown links (instead of Wikilinks) and I want to have the 'janitor' to extra checks like looking for dead links.
 
 ## Development
 
-You can either install the dependencies yourself or do development inside of the container (Dan Arias, 2019).
+You can either install the dependencies yourself or do development inside of a container (Dan Arias, 2019).
 
 ## Design
 
-Requirements:
+TODO: remove this section later, just writing it here as a reminder to myself.
 
-- The programming language must be statically-typed.
-- The end result should compile into a single executable (that requires no setup/installation to use).
-- The programming language should have a well-supported library for converting CommonMark to an abstract syntax tree.
+### Programming language
 
-I can find things that match a couple of these requirements, but nothing that matches all three.
+The program will be written in TypeScript, because I want to learn how to use TypeScript and the original 'note-link-janitor' (that this project is inspired by) is also written in TypeScript so that it can take advantage of [syntax-tree/mdast](https://github.com/syntax-tree/mdast) for manipulating Markdown abstract syntax trees.
 
-Golang has a library (see [here](https://github.com/yuin/goldmark)) for parsing Markdown as an abstract syntax tree. It is statically-typed and code can be trivially turned into a static binary. But the library seems really complex and doesn't seem to be usable for converting from Markdown-to-Markdown (which is what I want to do). Other CommonMark parsers [here](https://github.com/commonmark/commonmark-spec/wiki/List-of-CommonMark-Implementations).
-
-Could also try [russross/blackfriday](https://github.com/russross/blackfriday) as a Markdown parser for Golang; it's not strictly CommonMark but should be good enough I suppose. In V2, you can do `Markdown.Parse` to receive an abstract syntax tree to operate on, but again, it doesn't look like it can convert Markdown-to-Markdown.
-
-I'm leaning towards using TypeScript because the original script also uses TypeScript. TypeScript programs can be compiled into a single executable using Deno 1.6+ (Hacker News, 2019) or [vercel/pkg](https://github.com/vercel/pkg) and there is definitely a good library that can be used for manipulating Markdown ([syntax-tree/mdast](https://github.com/syntax-tree/mdast)). TypeScript is statically compiled, and of all the possible languages, it has the biggest advantage because I can use the original code as a reference.
-
+Might also be worth seeing if I can package the entire app as a single executable using something like Deno or [vercel/pkg](https://github.com/vercel/pkg) (Hacker News, 2019).
 
 ### Planning stage
 
@@ -45,7 +38,7 @@ for note in notes:
 
 Using hooks will allow for extensibility later on because I'm not sure how many operations I will need to perform on my notes (it will depend on how much stuff I want to do to the notes in the first place).
 
-Might be worth introducing the concept of a **Hook Manager** into which hooks can be added. The hook manager itself would be iterable, so that it could fit into the proposed structure above. Note: if I end up using Python - you only need to implement `__len__` and `__getitem__` to make something iterable (see [Raymond Hettinger - Beyond PEP 8](https://www.youtube.com/watch?v=wf-BqAjZb8M) @ 38:09).
+Might be worth introducing the concept of a **Hook Manager** into which hooks can be added. The hook manager itself would be iterable, so that it could fit into the proposed structure above.
 
 ## References
 
