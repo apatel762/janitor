@@ -22,7 +22,7 @@ Golang has a library (see [here](https://github.com/yuin/goldmark)) for parsing 
 
 There are [other CommonMark parsers](https://github.com/commonmark/commonmark-spec/wiki/List-of-CommonMark-Implementations) but they all seem to be used for going from CommonMark-to-HTML directly, which isn't what I want.
 
-I'm leaning towards using TypeScript because the original script also uses TypeScript. TypeScript programs can be compiled into a single executable using Deno 1.6+ or [vercel/pkg](https://github.com/vercel/pkg) and there is definitely a good library that can be used for manipulating Markdown ([syntax-tree/mdast](https://github.com/syntax-tree/mdast)). TypeScript is statically compiled, and of all the possible languages, it has the biggest advantage because I can use the original code as a reference.
+I'm leaning towards using TypeScript because the original script also uses TypeScript. TypeScript programs can be compiled into a single executable using Deno 1.6+ (Hacker News, 2019) or [vercel/pkg](https://github.com/vercel/pkg) and there is definitely a good library that can be used for manipulating Markdown ([syntax-tree/mdast](https://github.com/syntax-tree/mdast)). TypeScript is statically compiled, and of all the possible languages, it has the biggest advantage because I can use the original code as a reference.
 
 
 ### Planning stage
