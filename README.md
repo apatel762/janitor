@@ -18,9 +18,9 @@ Requirements:
 
 I can find things that match a couple of these requirements, but nothing that matches all three.
 
-Golang has a library (see [here](https://github.com/yuin/goldmark)) for parsing Markdown as an abstract syntax tree. It is statically-typed and code can be trivially turned into a static binary. But the library seems really complex and doesn't seem to be usable for converting from Markdown-to-Markdown (which is what I want to do).
+Golang has a library (see [here](https://github.com/yuin/goldmark)) for parsing Markdown as an abstract syntax tree. It is statically-typed and code can be trivially turned into a static binary. But the library seems really complex and doesn't seem to be usable for converting from Markdown-to-Markdown (which is what I want to do). Other CommonMark parsers [here](https://github.com/commonmark/commonmark-spec/wiki/List-of-CommonMark-Implementations).
 
-There are [other CommonMark parsers](https://github.com/commonmark/commonmark-spec/wiki/List-of-CommonMark-Implementations) but they all seem to be used for going from CommonMark-to-HTML directly, which isn't what I want.
+Could also try [russross/blackfriday](https://github.com/russross/blackfriday) as a Markdown parser for Golang; it's not strictly CommonMark but should be good enough I suppose. In V2, you can do `Markdown.Parse` to receive an abstract syntax tree to operate on, but again, it doesn't look like it can convert Markdown-to-Markdown.
 
 I'm leaning towards using TypeScript because the original script also uses TypeScript. TypeScript programs can be compiled into a single executable using Deno 1.6+ (Hacker News, 2019) or [vercel/pkg](https://github.com/vercel/pkg) and there is definitely a good library that can be used for manipulating Markdown ([syntax-tree/mdast](https://github.com/syntax-tree/mdast)). TypeScript is statically compiled, and of all the possible languages, it has the biggest advantage because I can use the original code as a reference.
 
