@@ -6,7 +6,7 @@ The name of the project ('janitor') is inspired by the ['note-link-janitor'](htt
 
 ## Development
 
-Enter the `Containerfile` while developing. It will have all of the required tools for developing and running the scripts.
+You can either install the dependencies yourself or do development inside of the container (Dan Arias, 2019).
 
 ## Design
 
@@ -50,4 +50,4 @@ Might be worth introducing the concept of a **Hook Manager** into which hooks ca
 ## References
 
 - Hacker News (December 9, 2020). "[on: Deno 1.6 supports compiling TypeScript to a single executable](https://news.ycombinator.com/item?id=25366484)". *[Archived](https://web.archive.org/web/20220227123534/https://news.ycombinator.com/item?id=25366484)*. Retrieved February 27, 2022.
-
+- Arias, Dan (February 26, 2019). "[Use Docker to Create a Node Development Environment](https://auth0.com/blog/use-docker-to-create-a-node-development-environment/)". *[Archived](https://web.archive.org/web/20220227132024/https://auth0.com/blog/use-docker-to-create-a-node-development-environment/)*. Retrieved February 27, 2022.
