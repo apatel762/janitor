@@ -1,0 +1,10 @@
+# Ignore everything, but still check in sub-directories
+*
+!*/
+
+# ----------------------
+
+!.gitignore
+!README.md
+!LICENSE
+
