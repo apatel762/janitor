@@ -10,4 +10,5 @@
 
 # ----------------------
 
+!.pre-commit-config.yaml
 !pyproject.toml
