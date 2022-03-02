@@ -10,6 +10,8 @@
 
 # ----------------------
 
+!*.py
+
 !.pre-commit-config.yaml
 !pyproject.toml
 !poetry.lock

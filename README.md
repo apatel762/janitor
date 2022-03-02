@@ -10,7 +10,7 @@ TODO: remove this section later, just writing it here as a reminder to myself.
 
 ### Programming language
 
-Will be written in Python. Installed as an executable via pipx.
+Will be written in Python. Installed as an executable via pipx (see <https://python-poetry.org/docs/pyproject/#scripts>).
 
 ### Planning stage
 
