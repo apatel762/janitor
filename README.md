@@ -12,6 +12,8 @@ TODO: remove this section later, just writing it here as a reminder to myself.
 
 Will be written in Python. Installed as an executable via pipx (see <https://python-poetry.org/docs/pyproject/#scripts>).
 
+Unit testing, see <https://docs.python-guide.org/writing/tests/>.
+
 ### Planning stage
 
 A **Crawler** would walk through all of the **Notes** and store their state & metadata into an **Index**. Each note (in the index) when crawled would be scanned for forward links.
