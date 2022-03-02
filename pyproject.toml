@@ -5,6 +5,9 @@ description = "A program for performing checks on, and enhancing, markdown notes
 authors = ["Arjun Patel <relay-git-1LKQ1GqLp0Nn4@aspatel.com>"]
 license = "MIT"
 
+[tool.poetry.scripts]
+janitor = "janitor.main:main"
+
 [tool.poetry.dependencies]
 python = "^3.9"
 pandoc = "^2.1"
