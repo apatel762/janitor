@@ -4,16 +4,16 @@ app = typer.Typer()
 
 
 @app.command()
-def hello(name: str):
-    typer.echo(f"Hello {name}")
+def plan(verbose: bool = False):
+    if verbose:
+        typer.echo("I am the janitor")
+    typer.echo("This is my plan... Nothing yet.")
 
 
 @app.command()
-def goodbye(name: str, formal: bool = False):
-    if formal:
-        typer.echo(f"Goodbye Ms. {name}. Have a good day.")
-    else:
-        typer.echo(f"Bye {name}!")
+def apply():
+    plan()
+    typer.echo("I am now doing things according to plan!")
 
 
 def main():
