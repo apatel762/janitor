@@ -6,10 +6,8 @@ app = typer.Typer()
 
 
 @app.command()
-def scan(verbose: bool = False):
-    if verbose:
-        typer.echo("I am the janitor and I am about to look around for stuff to do")
-    typer.echo("I am done scanning for stuff to do")
+def scan():
+    pass
 
 
 @app.command()
