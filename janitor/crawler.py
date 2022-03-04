@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from janitor.index import Index
+
 
 class CrawlerError(Exception):
     pass
@@ -10,9 +12,13 @@ class Crawler:
         if crawl_dir is None:
             raise CrawlerError("Cannot create a crawler without a crawl_dir")
 
-        self.crawl_dir = crawl_dir
+        self.crawl_dir: Path = crawl_dir
+        self.index: Index = Index()
 
-    def dump_results_to_disk(self):
+    def go(self):
+        pass
+
+    def dump(self):
         pass
 
     def __len__(self):
