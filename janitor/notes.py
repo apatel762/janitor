@@ -7,7 +7,7 @@ class Note:
         """
         :param path: A path to the Note file where this Note is stored.
         """
-        self.path = path
+        self.path: DirEntry = path
         self.backlinks: List[Note] = []
         self.forward_links: List[ForwardLink] = []
 
@@ -29,5 +29,5 @@ class ForwardLink:
         self.origin: Note = origin
         self.destination: Note = destination
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{self.__class__.__name__}[{self.origin}, {self.destination}]"

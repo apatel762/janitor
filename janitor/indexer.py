@@ -5,10 +5,10 @@ from .notes import Note
 
 
 class Index:
-    def __init__(self):
+    def __init__(self) -> None:
         self.notes: List[Note] = []
 
-    def register(self, note: Note):
+    def register(self, note: Note) -> None:
         """
         Registers a Note with the index (a fancy way of saying that it adds
         it to the Notes list).
@@ -25,10 +25,10 @@ class Index:
         """
         return False
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.notes)
 
-    def __getitem__(self, index):
+    def __getitem__(self, index) -> Note:
         if index > len(self):
             raise IndexError
         return self.notes[index]

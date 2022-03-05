@@ -32,10 +32,14 @@ def scan(
         dir_okay=True,
         readable=True,
         resolve_path=True,
-    )
-):
+    ),
+    assume_yes: bool = typer.Option(
+        False, "--assume-yes", help="Automatic 'Yes' to every prompt."
+    ),
+) -> None:
     typer.echo(f"Will index folder: {folder}")
-    typer.confirm("Would you like to continue?", abort=True)
+    if not assume_yes:
+        typer.confirm("Would you like to continue?", abort=True)
     typer.echo("Starting scan...")
 
     # crawl the given folder and build out the index
@@ -47,16 +51,16 @@ def scan(
 
 
 @app.command()
-def apply():
-    pass
+def apply() -> None:
+    typer.Exit()
 
 
 @app.command()
-def toolbox():
-    pass
+def toolbox() -> None:
+    typer.Exit()
 
 
-def main():
+def main() -> None:
     app()
 
 
