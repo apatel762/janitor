@@ -5,7 +5,7 @@ from janitor.main import app
 runner = CliRunner()
 
 
-def test_scan__when_invalid_folder__aborts():
+def test_scan__when_invalid_folder__aborts() -> None:
     result = runner.invoke(
         app, ["scan", "~/i/really/hope/this/folder/doesnt/exist/djbfksjfsk"]
     )
@@ -13,7 +13,7 @@ def test_scan__when_invalid_folder__aborts():
     assert result.exit_code == 2
 
 
-def test_scan__when_continue__begins_scan():
+def test_scan__when_continue__begins_scan() -> None:
     result = runner.invoke(app, ["scan", "."], input="y\n")
 
     assert "Will index folder:" in result.stdout
@@ -22,7 +22,7 @@ def test_scan__when_continue__begins_scan():
     assert result.exit_code == 0
 
 
-def test_scan__when_do_not_continue__app_aborts():
+def test_scan__when_do_not_continue__app_aborts() -> None:
     result = runner.invoke(app, ["scan", "."], input="n\n")
 
     assert result.exit_code == 1
