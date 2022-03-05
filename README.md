@@ -8,12 +8,7 @@ The name of the project ('janitor') is inspired by the ['note-link-janitor'](htt
 
 These are the features that I want the Janitor to have before I can call it 'ready'.
 
-- `janitor scan`
-  - Scan the notes folder and populate a metadata file (or a sqlite db?) with information about the notes.
-  - **Planning**
-    - A **Crawler** would walk through all the **Notes** and store their state & metadata into an **Index**.
-    - Each note (in the index) when crawled would be scanned for forward links.
-    - The planning stage is just for gathering data about the notes and persisting the index to disk somewhere that we can read it later.
+- `janitor scan` - basically done
 - `janitor apply`
   - Might need to think of a better name for this, but that's not important because it's easy to change.
   - Maintains backlink structure among interlinked Markdown notes.
@@ -54,6 +49,6 @@ An `nb` plugin should be included somewhere in this repo.
 
 Scripts support using env vars instead of params: <https://typer.tiangolo.com/tutorial/arguments/envvar/>
 
-## Backlinks
+## Extras
 
-Something here
+- <https://boisgera.github.io/pandoc/api/#pandoc> - Pandoc-to-Python API
