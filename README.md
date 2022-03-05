@@ -4,6 +4,11 @@ A program for performing checks on, and enhancing, my markdown notes.
 
 The name of the project ('janitor') is inspired by the ['note-link-janitor'](https://github.com/andymatuschak/note-link-janitor) by Andy Matuschak. I'm using this repo to maintain my own version of his scripts because I want to support regular Markdown links (instead of Wikilinks) and I want to have the 'janitor' to extra checks like looking for dead links.
 
+## Requirements
+
+- You must have `pandoc` installed on your machine.
+- Python ^3.9
+
 ## Doco
 
 Quick links to doco (TODO: clean this up later)
