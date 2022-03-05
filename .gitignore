@@ -8,6 +8,9 @@
 !README.md
 !LICENSE
 
+# the example note file
+!note*.md
+
 # ----------------------
 
 !*.py
