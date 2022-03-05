@@ -12,9 +12,16 @@ class Note:
         self.path: Union[DirEntry, PathLike] = path
         self.backlinks: List[Note] = []
         self.forward_links: List[ForwardLink] = []
+        self.sha256_checksum: str = ""
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}[{self.path.name} bl={len(self.backlinks)},fl={len(self.forward_links)}]"
+        return (
+            f"{self.__class__.__name__}"
+            f"[{self.path.name} "
+            f"bl={len(self.backlinks)},"
+            f"fl={len(self.forward_links)},"
+            f"sha256={'yes' if len(self.sha256_checksum) > 0 else 'no'}]"
+        )
 
 
 class ForwardLink:

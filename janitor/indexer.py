@@ -2,6 +2,8 @@ from os import PathLike
 from typing import List
 from typing import Optional
 
+import typer
+
 from .notes import Note
 
 
@@ -37,6 +39,7 @@ class Index:
 
         :return: True if the operation was successful, otherwise False.
         """
+        typer.echo(f"Dumping {self} to: {location}")
         return False
 
     def search_for_note(self, file_name: str) -> Optional[Note]:

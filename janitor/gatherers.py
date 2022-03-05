@@ -1,3 +1,4 @@
+import hashlib
 from functools import cache
 from typing import Any
 
@@ -120,3 +121,30 @@ class ForwardLinkGatherer(Gatherer):
             )
 
         return len(note.forward_links) > 0
+
+
+class Sha256ChecksumGatherer(Gatherer):
+    """
+    A gatherer for calculating the SHA-256 checksum for the contents of a
+    given file.
+    """
+
+    def __init__(self) -> None:
+        pass
+
+    def apply(self, note: Note) -> bool:
+        """
+        Calculate the SHA-256 checksum for the contents of the given Note and
+        store the Hex digest in the Note object.
+
+        :param note: The Note that you want to calculate a checksum for.
+        :return: True if the checksum was calculated successfully, otherwise False.
+        """
+        with open(note.path, "rb") as f:
+            file_hash = hashlib.sha256()
+            while chunk := f.read(8192):
+                file_hash.update(chunk)
+
+            note.sha256_checksum = file_hash.hexdigest()
+
+        return True
