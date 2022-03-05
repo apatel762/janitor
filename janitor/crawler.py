@@ -43,7 +43,7 @@ class Crawler:
         cache_home: str = os.getenv("XDG_CACHE_HOME", os.path.expanduser("~/.cache"))
         cache_partition_key: str = hashlib.sha256(
             os.path.abspath(self.crawl_dir).encode()
-        ).hexdigest()[:6]
+        ).hexdigest()
 
         cache_path: Path = Path(f"{cache_home}/janitor/{cache_partition_key}")
         cache_path.mkdir(parents=True, exist_ok=True)

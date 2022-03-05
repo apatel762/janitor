@@ -1,4 +1,7 @@
+import json
+import os
 from os import PathLike
+from pathlib import Path
 from typing import List
 from typing import Optional
 
@@ -39,8 +42,18 @@ class Index:
 
         :return: True if the operation was successful, otherwise False.
         """
-        typer.echo(f"Dumping {self} to: {location}")
-        return False
+        target_location: PathLike = Path(os.path.join(location, "index.json"))
+        typer.echo(f"Dumping {self} to: {target_location}")
+
+        # serialise all the notes and construct the JSON index
+        index_as_json: dict = {
+            os.path.basename(note.path): note.to_json() for note in self.__notes
+        }
+
+        with open(target_location, "w", encoding="utf-8") as f:
+            json.dump(index_as_json, f, ensure_ascii=False, indent=4)
+
+        return True
 
     def search_for_note(self, file_name: str) -> Optional[Note]:
         """
