@@ -1,7 +1,13 @@
+import os.path
 from os import DirEntry
 from os import PathLike
 from typing import List
+from typing import Optional
 from typing import Union
+
+
+class NoteSerialisationError(Exception):
+    pass
 
 
 class Note:
@@ -12,15 +18,34 @@ class Note:
         self.path: Union[DirEntry, PathLike] = path
         self.backlinks: List[Note] = []
         self.forward_links: List[ForwardLink] = []
-        self.sha256_checksum: str = ""
+        self.sha256_checksum: Optional[str] = None
+
+    def to_json(self) -> dict:
+        if len(self.sha256_checksum) is None:
+            raise NoteSerialisationError(
+                f"{self} has no SHA-256 checksum recorded. Was the checksum calculated before serialisation?"
+            )
+        return {
+            "sha256": self.sha256_checksum,
+            "path": os.path.abspath(self.path),
+            "links": {
+                "back": [note.path.name for note in self.backlinks],
+                "forward": [fl.destination_file_name for fl in self.forward_links],
+            },
+        }
 
     def __repr__(self) -> str:
+        has_checksum: str = (
+            "yes"
+            if self.sha256_checksum is not None and len(self.sha256_checksum) > 0
+            else "no"
+        )
         return (
             f"{self.__class__.__name__}"
             f"[{self.path.name} "
             f"bl={len(self.backlinks)},"
             f"fl={len(self.forward_links)},"
-            f"sha256={'yes' if len(self.sha256_checksum) > 0 else 'no'}]"
+            f"sha256={has_checksum}]"
         )
 
 
