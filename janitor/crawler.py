@@ -13,7 +13,7 @@ class CrawlerError(Exception):
 
 
 class Crawler:
-    def __init__(self, crawl_dir: Path):
+    def __init__(self, crawl_dir: Path) -> None:
         if crawl_dir is None:
             raise CrawlerError("Cannot create a crawler without a crawl_dir")
 
@@ -21,10 +21,10 @@ class Crawler:
         self.index: Index = Index()
         self.gatherers: List[Gatherer] = []
 
-    def validate_entry(self, entry: DirEntry):
+    def validate_entry(self, entry: DirEntry) -> bool:
         return entry.is_file() and entry.name.endswith(".md")
 
-    def go(self):
+    def go(self) -> None:
         with os.scandir(self.crawl_dir) as sd:
             for entry in sd:  # type: DirEntry
                 if not self.validate_entry(entry):

@@ -42,7 +42,7 @@ These are the features that I want the Janitor to have before I can call it 'rea
   - Is it possible to call `nb` from Python? If so we could potentially replace my `notes.sh` script with a toolbox subcommand.
   - <https://typer.tiangolo.com/tutorial/subcommands/add-typer/>
 
-### Misc. requirements
+## Misc. requirements
 
 All long-running stuff will use a progress bar: <https://typer.tiangolo.com/tutorial/progressbar/>
 
@@ -53,8 +53,7 @@ All user-facing parts of the CLI are fully documented: <https://typer.tiangolo.c
 An `nb` plugin should be included somewhere in this repo.
 
 Scripts support using env vars instead of params: <https://typer.tiangolo.com/tutorial/arguments/envvar/>
-### Programming language
 
-Will be written in Python. Installed as an executable via pipx (see <https://python-poetry.org/docs/pyproject/#scripts>).
+## Backlinks
 
-Unit testing, see <https://docs.python-guide.org/writing/tests/>.
+Something here
