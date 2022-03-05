@@ -15,4 +15,4 @@ def test_crawler__no_dir_provided__raises_crawler_error():
 def test_crawler__when_created__repr_string_shows_size():
     crawler: Crawler = Crawler(crawl_dir=Path())
 
-    assert repr(crawler) == "Crawler[size=0]"
+    assert repr(crawler) == "Crawler[.]"

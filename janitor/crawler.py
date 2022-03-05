@@ -1,6 +1,11 @@
+import os
+from os import DirEntry
 from pathlib import Path
+from typing import List
 
-from janitor.indexer import Indexer
+from .gatherers import Gatherer
+from .indexer import Index
+from .notes import Note
 
 
 class CrawlerError(Exception):
@@ -13,21 +18,26 @@ class Crawler:
             raise CrawlerError("Cannot create a crawler without a crawl_dir")
 
         self.crawl_dir: Path = crawl_dir
-        self.index: Indexer = Indexer()
+        self.index: Index = Index()
+        self.gatherers: List[Gatherer] = []
+
+    def validate_entry(self, entry: DirEntry):
+        return entry.is_file() and entry.name.endswith(".md")
 
     def go(self):
-        pass
+        with os.scandir(self.crawl_dir) as sd:
+            for entry in sd:  # type: DirEntry
+                if not self.validate_entry(entry):
+                    continue
 
-    def dump(self):
-        pass
+                note: Note = Note(path=entry)
 
-    def __len__(self):
-        return 0
+                # ensure that the Index is aware of this Note before we
+                # gather information about it
+                self.index.register(note)
 
-    def __getitem__(self, index):
-        # if index > len(self):
-        #     raise IndexError
-        pass
+                for gatherer in self.gatherers:  # type: Gatherer
+                    gatherer.apply(note)
 
-    def __repr__(self):
-        return f"{self.__class__.__name__}[size={len(self)}]"
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}[{self.crawl_dir}]"
