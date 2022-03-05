@@ -1,7 +1,7 @@
 # TODO: make custom error? not sure if needed
 
 
-class Index:
+class Indexer:
     def __init__(self):
         pass
 

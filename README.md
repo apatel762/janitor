@@ -2,7 +2,7 @@
 
 A program for performing checks on, and enhancing, my markdown notes.
 
-The name of the project ('janitor') is inspired by the ['note-link-janitor'](https://github.com/andymatuschak/note-link-janitor) by Andy Matuschak. I'm using this repo to maintain my own version of his scripts because I want to support regular markdown links (instead of Wikilinks) and I want to have the 'janitor' to extra checks like looking for dead links.
+The name of the project ('janitor') is inspired by the ['note-link-janitor'](https://github.com/andymatuschak/note-link-janitor) by Andy Matuschak. I'm using this repo to maintain my own version of his scripts because I want to support regular Markdown links (instead of Wikilinks) and I want to have the 'janitor' to extra checks like looking for dead links.
 
 ## Roadmap
 
@@ -10,7 +10,10 @@ These are the features that I want the Janitor to have before I can call it 'rea
 
 - `janitor scan`
   - Scan the notes folder and populate a metadata file (or a sqlite db?) with information about the notes.
-  - All of the other commands should depend on this one, kind of like how `terraform apply` depends on `terraform plan`. This will make it easier to do 'dry-runs'.
+  - **Planning**
+    - A **Crawler** would walk through all the **Notes** and store their state & metadata into an **Index**.
+    - Each note (in the index) when crawled would be scanned for forward links.
+    - The planning stage is just for gathering data about the notes and persisting the index to disk somewhere that we can read it later.
 - `janitor apply`
   - Might need to think of a better name for this, but that's not important because it's easy to change.
   - Maintains backlink structure among interlinked Markdown notes.
@@ -18,6 +21,12 @@ These are the features that I want the Janitor to have before I can call it 'rea
   - This option will make it clear that it is about to modify your notes and will ask if you want to back them up.
     - Could use a script arg to bypass this
   - This option will ask you *y/N* (the same way that `nb` does) before continuing. <https://typer.tiangolo.com/tutorial/prompt/#confirm-or-abort>.
+  - **Execution**
+    - The execution stage will read the index into memory and do things to the notes based on the data that we've gathered.
+    - This would involve the usage of **Hooks**, where each hook is applied to a notes while it's being processed.
+    - Every hook is applied sequentially to a note to fully process that note before moving to the next.
+    - Using hooks will allow for extensibility later on because I'm not sure how many operations I will need to perform on my notes (it will depend on how much stuff I want to do to the notes in the first place).
+    - Might be worth introducing the concept of a **Hook Manager** into which hooks can be added. The hook manager itself would be iterable, so that it could fit into the proposed structure above.
 - `janitor config`
   - **This whole sub-command is a big 'maybe' from me, don't know how useful it'll *really* be**
   - Use this to manage a config file that controls the behaviour of the rest of the script.
@@ -44,35 +53,8 @@ All user-facing parts of the CLI are fully documented: <https://typer.tiangolo.c
 An `nb` plugin should be included somewhere in this repo.
 
 Scripts support using env vars instead of params: <https://typer.tiangolo.com/tutorial/arguments/envvar/>
-
-## Design
-
-TODO: remove this section later, just writing it here as a reminder to myself.
-
 ### Programming language
 
 Will be written in Python. Installed as an executable via pipx (see <https://python-poetry.org/docs/pyproject/#scripts>).
 
 Unit testing, see <https://docs.python-guide.org/writing/tests/>.
-
-### Planning stage
-
-A **Crawler** would walk through all of the **Notes** and store their state & metadata into an **Index**. Each note (in the index) when crawled would be scanned for forward links.
-
-The planning stage is just for gathering data about the notes and persisting the index to disk somewhere that we can read it later.
-
-### Execution stage
-
-The execution stage will read the index into memory and do things to the notes based on the data that we've gathered. This would involve the usage of **Hooks**, where each hook is applied to a notes while it's being processed.
-
-Every hook is applied sequentially to a note to fully process that note before moving to the next (pseudocode below):
-
-```python
-for note in notes:
-    for hook in hooks:
-        hook.apply(note)
-```
-
-Using hooks will allow for extensibility later on because I'm not sure how many operations I will need to perform on my notes (it will depend on how much stuff I want to do to the notes in the first place).
-
-Might be worth introducing the concept of a **Hook Manager** into which hooks can be added. The hook manager itself would be iterable, so that it could fit into the proposed structure above.

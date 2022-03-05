@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from janitor.index import Index
+from janitor.indexer import Indexer
 
 
 class CrawlerError(Exception):
@@ -13,7 +13,7 @@ class Crawler:
             raise CrawlerError("Cannot create a crawler without a crawl_dir")
 
         self.crawl_dir: Path = crawl_dir
-        self.index: Index = Index()
+        self.index: Indexer = Indexer()
 
     def go(self):
         pass
@@ -31,11 +31,3 @@ class Crawler:
 
     def __repr__(self):
         return f"{self.__class__.__name__}[size={len(self)}]"
-
-
-class Note:
-    def __init__(self, file_path: Path):
-        self.file_path = file_path
-
-    def __repr__(self):
-        return f"{self.__class__.__name__}[{self.file_path.name}]"
