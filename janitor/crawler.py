@@ -3,6 +3,8 @@ from os import DirEntry
 from pathlib import Path
 from typing import List
 
+import typer
+
 from .gatherers import Gatherer
 from .indexer import Index
 from .notes import Note
@@ -36,6 +38,11 @@ class Crawler:
                 # gather information about it
                 self.index.register(note)
 
+        # use a progress bar to provide feedback for the user as this
+        # could be quite slow depending on how many notes the user has...
+        # (takes about 30 seconds for me, and I have about 400 Notes)
+        with typer.progressbar(self.index) as pb:
+            for note in pb:  # type: Note
                 for gatherer in self.gatherers:  # type: Gatherer
                     gatherer.apply(note)
 
