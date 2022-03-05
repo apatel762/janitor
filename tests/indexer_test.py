@@ -9,6 +9,6 @@ def test_indexer__when_created__repr_string_indicates_that_its_empty():
 
 def test_indexer__when_created_with_elements__repr_string_shows_size():
     index = Index()
-    index.notes = [1, 2]
+    index.__notes = [1, 2]
 
     assert repr(index) == "Index(size=2)"

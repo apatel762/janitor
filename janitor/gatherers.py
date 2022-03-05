@@ -1,9 +1,12 @@
+from functools import cache
 from typing import Any
 
 import pandoc
 from pandoc.types import Header
+from pandoc.types import Link
 from pandoc.types import Pandoc
 
+from .notes import ForwardLink
 from .notes import Note
 
 
@@ -16,6 +19,7 @@ class Gatherer:
     that all the Gatherers will mutate the Note that you give it).
     """
 
+    @cache
     def parse_abstract_syntax_tree(self, note: Note) -> Pandoc:
         """
         Uses the pandoc library to convert a given Markdown Note into a
@@ -69,15 +73,27 @@ class ForwardLinkGatherer(Gatherer):
         header_text: str = pandoc.write(elt[2]).strip()
         return header_text == "Backlinks"
 
-    def is_link(self, elt: Any) -> bool:
+    def is_link_to_another_note(self, elt: Any, n: Note) -> bool:
         """
-        Determine whether a given Pandoc tree element is a Link
+        Determine whether a given Pandoc tree element is a Link.
 
-        :param elt: The Pandoc tree element
-        :return: True if the element is a Link, otherwise False
+        :param elt: The Pandoc tree element.
+        :return: True if the element is a Link, otherwise False.
         """
-        # TODO: implement this
-        return False
+        if not isinstance(elt, Link):
+            return False
+
+        # for a Link element, it's the third thing which holds the
+        # link target (first thing is the attrs and second is the alt
+        # text, if any)
+        link_target: str = "".join(elt[2])
+
+        return (
+            link_target != n.path.name
+            and link_target.endswith(".md")
+            and not link_target.startswith(".")
+            and "http" not in link_target
+        )
 
     def apply(self, note: Note) -> bool:
         """
@@ -96,12 +112,11 @@ class ForwardLinkGatherer(Gatherer):
                 break
 
             # don't care about anything that isn't a link
-            if not self.is_link(element):
+            if not self.is_link_to_another_note(element, note):
                 continue
 
-            # TODO: if it's not an internal link, skip
+            note.forward_links.append(
+                ForwardLink(origin=note, destination_file_name="".join(element[2]))
+            )
 
-            # TODO: create ForwardLink and append to Note data
-            pass
-
-        return True
+        return len(note.forward_links) > 0
