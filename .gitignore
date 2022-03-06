@@ -12,7 +12,9 @@
 !note*.md
 
 # GitHub-specific files
-!.github/*
+!.github/dependabot.yml
+!.github/workflows/codeql.yml
+!.github/workflows/pytest.yml
 
 # ----------------------
 
