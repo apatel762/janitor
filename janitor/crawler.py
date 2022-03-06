@@ -65,6 +65,8 @@ class Crawler:
         # could be quite slow depending on how many notes the user has...
         # (takes about 30 seconds for me, and I have about 400 Notes)
         with typer.progressbar(self.index) as pb:
+            # TODO: GH-5 swap these loops so that one Gatherer completely
+            #  finishes before the next one starts
             for note in pb:  # type: Note
                 for gatherer in self.gatherers:  # type: Gatherer
                     gatherer.apply(self.index, note)

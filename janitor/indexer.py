@@ -57,7 +57,7 @@ class Index:
 
         # serialise all the notes and construct the JSON index
         index_as_json: dict = {
-            os.path.basename(note.path): note.to_json() for note in self.__notes
+            os.path.basename(note.path): note.serialise() for note in self.__notes
         }
 
         with open(target_location, "w", encoding="utf-8") as f:

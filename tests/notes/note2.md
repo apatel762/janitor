@@ -58,6 +58,16 @@ laesaque Achille. Nixique locis claudit regnis, bracchia ruricolae
 nemorosis aequora lumina. [Ibi fatis](note3.md), fitque saxo si soleat at
 saxo putetis quoque.
 
+This is another references to note 3 [Ibi fatis](note3.md)
+
+This is yet another references to note 3 [Ibi fatis](note3.md)
+
+You guessed it! This is another references to note 3 [Ibi fatis](note3.md)
+
+Wow! This is another references to note 3 [Ibi fatis](note3.md)
+
+Ok I'll stop now but This is another references to note 3 [Ibi fatis](note3.md)
+
 ```
 ipod *= leaderboard(3);
 inboxVirus *= dock_token;
