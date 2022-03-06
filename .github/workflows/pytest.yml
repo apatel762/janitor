@@ -23,8 +23,8 @@ jobs:
     - name: Install dependencies
       run: |
         # Without Pandoc the Janitor doesn't work.
-        apt-get update
-        apt-get install -y pandoc
+        sudo apt-get update
+        sudo apt-get install -y pandoc
 
         # Install Python dependencies (which includes pytest) so
         # that the tests can be run
