@@ -3,6 +3,7 @@ from pathlib import Path
 import typer
 
 from .crawler import Crawler
+from .gatherers import BacklinkGatherer
 from .gatherers import ForwardLinkGatherer
 from .gatherers import Sha256ChecksumGatherer
 
@@ -56,6 +57,7 @@ def scan(
     crawler = Crawler(crawl_dir=folder)
     crawler.gatherers.append(Sha256ChecksumGatherer())
     crawler.gatherers.append(ForwardLinkGatherer())
+    crawler.gatherers.append(BacklinkGatherer())
     crawler.go()
 
     raise typer.Exit()
