@@ -37,7 +37,7 @@ jobs:
         python -m pip install --user pipx
         python -m pipx ensurepath
         pipx install poetry
-        poetry init
+        poetry install
         poetry shell
 
         # Set the `CODEQL-PYTHON` environment variable to the Python executable
