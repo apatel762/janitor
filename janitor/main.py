@@ -42,15 +42,15 @@ def scan(
     ),
 ) -> None:
     typer.echo(f"Will index folder: {folder}")
+
     if not assume_yes:
         typer.confirm("Would you like to continue?", abort=True)
+
     typer.echo("Starting scan...")
 
     if force_index_rebuild:
-        typer.echo(
-            "The '--force-index-rebuild' option is not supported at the moment.",
-            color=True,
-        )
+        typer.echo("The '--force-index-rebuild' option is not supported at the moment.")
+        raise typer.Exit(code=1)
 
     # crawl the given folder and build out the index
     crawler = Crawler(crawl_dir=folder)
@@ -58,17 +58,17 @@ def scan(
     crawler.gatherers.append(ForwardLinkGatherer())
     crawler.go()
 
-    typer.Exit()
+    raise typer.Exit()
 
 
 @app.command()
 def apply() -> None:
-    typer.Exit()
+    raise typer.Exit()
 
 
 @app.command()
 def toolbox() -> None:
-    typer.Exit()
+    raise typer.Exit()
 
 
 def main() -> None:
