@@ -11,6 +11,9 @@
 # the example note files
 !note*.md
 
+# GitHub-specific files
+!.github/*
+
 # ----------------------
 
 !*.py
