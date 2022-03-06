@@ -3,7 +3,7 @@ name = "janitor"
 version = "0.1.0"
 description = "A program for performing checks on, and enhancing, markdown notes."
 authors = ["Arjun Patel <relay-git-1LKQ1GqLp0Nn4@aspatel.com>"]
-license = "MIT"
+license = "AGPL-3.0-or-later"
 readme = "README.md"
 repository = "https://github.com/apatel762/janitor"
 
