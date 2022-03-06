@@ -1,6 +1,9 @@
 name: "CodeQL"
 
 on:
+  push:
+    branches:
+      - 'master'
   pull_request:
     branches:
       - 'master'
@@ -23,10 +26,32 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install --user pipx
+        python -m pipx ensurepath
+        pipx install poetry
+        poetry init
+        poetry shell
+
+        # Set the `CODEQL-PYTHON` environment variable to the Python executable
+        # that includes the dependencies
+        echo "CODEQL_PYTHON=$(which python)" >> $GITHUB_ENV
+
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v1
       with:
         languages: ${{ matrix.language }}
+        # Override the default behavior so that the action doesn't attempt
+        # to auto-install Python dependencies.
+        # https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#analyzing-python-dependencies
+        setup-python-dependencies: false
 
     - name: Autobuild
       uses: github/codeql-action/autobuild@v1
