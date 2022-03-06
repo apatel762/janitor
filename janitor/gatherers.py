@@ -12,8 +12,8 @@ from pandoc.types import Link
 from pandoc.types import Pandoc
 
 from .indexer import Index
-from .notes import ForwardLink
 from .notes import Note
+from .notes import NoteLink
 from .typerutils import warn
 
 
@@ -61,14 +61,14 @@ class Gatherer(ABC):
         raise NotImplementedError("Use a subclass!")
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}[{hash(self)}]"
+        return f"{self.__class__.__name__}[{id(self)}]"
 
 
 class BacklinkGatherer(Gatherer):
     """
-    A gatherer that will detect all backlinks for a note. It works by scanning
-    all the forward links in the Index and generating the inverse backlink
-    information from that.
+    A gatherer that will detect all backlinks for a Note. It works by scanning
+    all the forward links for every Note in the Index and storing the inverse
+    backlink information from that.
 
     NOTE: This gatherer should be used AFTER the ForwardLinkGatherer or else
     it will report everything as a broken link.
@@ -86,20 +86,19 @@ class BacklinkGatherer(Gatherer):
         :param note: The Note that you are currently processing.
         :return: True if the operation was successful, otherwise False
         """
-        for forward_link in note.forward_links:
+        for link in note.forward_links:
             other_note: Optional[Note] = index.search_for_note(
-                file_name=forward_link.destination_file_name
+                file_name=link.destination_file_name
             )
             if other_note is None:
                 # TODO: should there be a separate broken link checker to pick
                 #  these up or should I just handle it here?? separate checker
                 #  would be nice to keep things clean but handling it here would
                 #  be faster
-                typer.echo(warn(f"Possible broken link: {forward_link}."))
+                typer.echo(warn(f"Possible broken link: {link}."))
 
-            # add this note (the Forward Link origin) as a backlink in the
-            # other note.
-            other_note.backlinks.append(forward_link.origin)
+            # add the NoteLink as a backlink in the other note
+            other_note.backlinks.add(link)
 
         return True
 
@@ -164,7 +163,7 @@ class ForwardLinkGatherer(Gatherer):
         """
         tree: Pandoc = self.parse_abstract_syntax_tree(note)
 
-        for element in pandoc.iter(tree[1]):
+        for element, path in pandoc.iter(tree[1], path=True):
             # don't want to include any links that come after the Backlinks
             # header (if any) so if we see that we've got to stop
             if self.is_backlinks_header(element):
@@ -174,8 +173,18 @@ class ForwardLinkGatherer(Gatherer):
             if not self.is_link_to_another_note(element, note):
                 continue
 
-            note.forward_links.append(
-                ForwardLink(origin=note, destination_file_name="".join(element[2]))
+            # we want to also record the context of every link
+            # this means that we have to capture the content of the parent
+            # element for every link; we traverse up the tree by 'one' to do
+            # this (using `path[-1]` and then get contents from `[0]`).
+            link_context: str = "".join(pandoc.write(path[-1][0])).replace("\n", " ")
+
+            note.forward_links.add(
+                NoteLink(
+                    origin=note,
+                    origin_context=link_context,
+                    destination_file_name="".join(element[2]),
+                )
             )
 
         return len(note.forward_links) > 0
