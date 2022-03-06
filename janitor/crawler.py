@@ -67,7 +67,7 @@ class Crawler:
         with typer.progressbar(self.index) as pb:
             for note in pb:  # type: Note
                 for gatherer in self.gatherers:  # type: Gatherer
-                    gatherer.apply(note)
+                    gatherer.apply(self.index, note)
 
         # persist the index to the filesystem so that the other commands can
         # read the data

@@ -1,17 +1,32 @@
 import hashlib
+from abc import ABC
+from abc import abstractmethod
 from functools import cache
 from typing import Any
+from typing import Optional
 
 import pandoc
+import typer
 from pandoc.types import Header
 from pandoc.types import Link
 from pandoc.types import Pandoc
 
+from .indexer import Index
 from .notes import ForwardLink
 from .notes import Note
+from .typerutils import warn
 
 
-class Gatherer:
+class GathererError(Exception):
+    """
+    An error that is thrown when something goes wrong during the processing
+    logic of the Gatherer classes.
+    """
+
+    pass
+
+
+class Gatherer(ABC):
     """
     Represents a collection of logic that scans the content of a Markdown
     Note and gathers information about it.
@@ -34,17 +49,59 @@ class Gatherer:
         """
         return pandoc.read(file=note.path.path, format="markdown")
 
-    def apply(self, note: Note) -> bool:
+    @abstractmethod
+    def apply(self, index: Index, note: Note) -> bool:
         """
         This method should be overridden by subclasses to implement the
         'gathering' logic.
 
+        :param index: The Note Index.
         :param note: A Markdown Note object to gather information from.
         """
         raise NotImplementedError("Use a subclass!")
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}[{hash(self)}]"
+
+
+class BacklinkGatherer(Gatherer):
+    """
+    A gatherer that will detect all backlinks for a note. It works by scanning
+    all the forward links in the Index and generating the inverse backlink
+    information from that.
+
+    NOTE: This gatherer should be used AFTER the ForwardLinkGatherer or else
+    it will report everything as a broken link.
+    """
+
+    def __init__(self) -> None:
+        pass
+
+    def apply(self, index: Index, note: Note) -> bool:
+        """
+        Using the Index, register backlinks for any Notes that are mentioned
+        by the Note that we are currently processing.
+
+        :param index: The Note Index.
+        :param note: The Note that you are currently processing.
+        :return: True if the operation was successful, otherwise False
+        """
+        for forward_link in note.forward_links:
+            other_note: Optional[Note] = index.search_for_note(
+                file_name=forward_link.destination_file_name
+            )
+            if other_note is None:
+                # TODO: should there be a separate broken link checker to pick
+                #  these up or should I just handle it here?? separate checker
+                #  would be nice to keep things clean but handling it here would
+                #  be faster
+                typer.echo(warn(f"Possible broken link: {forward_link}."))
+
+            # add this note (the Forward Link origin) as a backlink in the
+            # other note.
+            other_note.backlinks.append(forward_link.origin)
+
+        return True
 
 
 class ForwardLinkGatherer(Gatherer):
@@ -96,11 +153,12 @@ class ForwardLinkGatherer(Gatherer):
             and "http" not in link_target
         )
 
-    def apply(self, note: Note) -> bool:
+    def apply(self, index: Index, note: Note) -> bool:
         """
         Scan the contents of a Note, find all Forward Links and store them
         in the given Note.
 
+        :param index: The Note Index.
         :param note: The Note that you want to search.
         :return: True if any Forward Links were found, otherwise False.
         """
@@ -132,11 +190,12 @@ class Sha256ChecksumGatherer(Gatherer):
     def __init__(self) -> None:
         pass
 
-    def apply(self, note: Note) -> bool:
+    def apply(self, index: Index, note: Note) -> bool:
         """
         Calculate the SHA-256 checksum for the contents of the given Note and
         store the Hex digest in the Note object.
 
+        :param index: The Note Index.
         :param note: The Note that you want to calculate a checksum for.
         :return: True if the checksum was calculated successfully, otherwise False.
         """

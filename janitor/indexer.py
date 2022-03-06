@@ -27,7 +27,7 @@ class Index:
     def __init__(self) -> None:
         self.__notes: List[Note] = []
 
-    def register(self, note: Optional[Note]) -> None:
+    def register(self, note: Note) -> None:
         """
         Registers a Note with the index (a fancy way of saying that it adds
         it to the Notes list).
@@ -41,7 +41,7 @@ class Index:
 
         self.__notes.append(note)
 
-    def dump(self, location: Optional[PathLike]) -> bool:
+    def dump(self, location: PathLike) -> bool:
         """
         Dump the indexed content to disk in the JSON format.
 
@@ -65,7 +65,7 @@ class Index:
 
         return True
 
-    def search_for_note(self, file_name: Optional[str]) -> Optional[Note]:
+    def search_for_note(self, file_name: str) -> Optional[Note]:
         """
         Search the Index for a Note using a file name.
 
