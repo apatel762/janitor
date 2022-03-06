@@ -4,11 +4,6 @@ A program for performing checks on, and enhancing, my markdown notes.
 
 The name of the project ('janitor') is inspired by the ['note-link-janitor'](https://github.com/andymatuschak/note-link-janitor) by Andy Matuschak. I'm using this repo to maintain my own version of his scripts because I want to support regular Markdown links (instead of Wikilinks) and I want to have the 'janitor' to extra checks like looking for dead links.
 
-## Requirements
-
-- You must have `pandoc` installed on your machine.
-- Python ^3.9
-
 ## Doco
 
 Quick links to doco (TODO: clean this up later)
@@ -16,11 +11,32 @@ Quick links to doco (TODO: clean this up later)
 - <https://boisgera.github.io/pandoc/api/#pandoc> - Pandoc-to-Python API
 - <https://hackage.haskell.org/package/pandoc-types> - click on `Text.Pandoc.Definition` (official Pandoc types doc)
 
+## Requirements
+
+- You must have `pandoc` installed on your machine.
+- Python ^3.9
+
+## Installation
+
+### pipx *(recommended)*
+
+This method is recommended so that the dependencies of the janitor app don't conflict with your system installation of Python.
+
+```commandline
+pipx install git+https://github.com/apatel762/janitor.git
+```
+
+### pip
+
+```commandline
+python -m pip install git+https://github.com/apatel762/janitor.git
+```
+
 ## Roadmap
 
 These are the features that I want the Janitor to have before I can call it 'ready'.
 
-- `janitor scan` - basically done
+- `janitor scan`
 - `janitor apply`
   - Might need to think of a better name for this, but that's not important because it's easy to change.
   - Maintains backlink structure among interlinked Markdown notes.
