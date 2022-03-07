@@ -1,6 +1,6 @@
 # janitor
 
-[![CodeQL](https://github.com/apatel762/janitor/actions/workflows/codeql.yml/badge.svg)](https://github.com/apatel762/janitor/actions/workflows/codeql.yml)
+[![PyTest](https://github.com/apatel762/janitor/actions/workflows/pytest.yml/badge.svg)](https://github.com/apatel762/janitor/actions/workflows/pytest.yml) [![CodeQL](https://github.com/apatel762/janitor/actions/workflows/codeql.yml/badge.svg)](https://github.com/apatel762/janitor/actions/workflows/codeql.yml)
 
 A program for performing checks on, and enhancing, my markdown notes.
 
