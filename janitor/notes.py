@@ -26,7 +26,7 @@ class Note:
 
         :return: A dictionary representing the JSON structure of the Note metadata
         """
-        if len(self.sha256_checksum) is None:
+        if self.sha256_checksum is None or len(self.sha256_checksum) == 0:
             raise NoteSerialisationError(
                 f"{self} has no SHA-256 checksum recorded. Was the checksum calculated before serialisation?"
             )
@@ -56,7 +56,7 @@ class Note:
         return hash(self.path)
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}[{self.path.name}]"
+        return f"{self.__class__.__name__}[{'None' if self.path is None else self.path.name}]"
 
 
 class NoteLink:
@@ -81,7 +81,16 @@ class NoteLink:
 
         :return: A dictionary representing the JSON structure of this NoteLink
         """
+        if self.origin is None:
+            raise NoteSerialisationError(
+                "Cannot serialise NoteLink when self.origin is None"
+            )
+        if self.origin.path is None:
+            raise NoteSerialisationError(
+                "Cannot serialise NoteLink when self.origin.path is None"
+            )
         return {
+            "origin": self.origin.path.name,
             "destination": self.destination_file_name,
             "context": self.origin_context,
         }
@@ -101,4 +110,11 @@ class NoteLink:
         return hash((self.origin, self.origin_context, self.destination_file_name))
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}[{self.origin.path.name} -> {self.destination_file_name}]"
+        # ensure that we have something to include in the repr string even if the
+        # information is not present
+        origin: str = (
+            "None"
+            if self.origin is None or self.origin.path is None
+            else self.origin.path.name
+        )
+        return f"{self.__class__.__name__}[{origin} -> {self.destination_file_name}]"
