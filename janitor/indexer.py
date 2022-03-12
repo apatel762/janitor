@@ -34,9 +34,9 @@ class Index:
 
         :param note: A Note to add to the index
         """
-        if note is None:
+        if type(note) is not Note:
             raise NoteIndexerError(
-                f"Cannot register a {type(note)}-type object with the Index."
+                f"Cannot register a {repr(type(note))}-type object with the Index."
             )
 
         self.__notes.append(note)
@@ -56,14 +56,24 @@ class Index:
         typer.echo(f"Dumping {self} to: {target_location}")
 
         # serialise all the notes and construct the JSON index
-        index_as_json: dict = {
-            os.path.basename(note.path): note.serialise() for note in self.__notes
-        }
+        index_as_json: dict = self.serialise()
 
         with open(target_location, "w", encoding="utf-8") as f:
             json.dump(index_as_json, f, ensure_ascii=False, indent=4)
 
         return True
+
+    def serialise(self) -> dict:
+        """
+        Transforms the Index and its contents into a JSON structure
+
+        :return: A dictionary object representing the JSON structure of the Index.
+        """
+        index_as_json: dict = {
+            os.path.basename(note.path): note.serialise() for note in self.__notes
+        }
+
+        return index_as_json
 
     def search_for_note(self, file_name: str) -> Optional[Note]:
         """
