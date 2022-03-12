@@ -9,4 +9,12 @@ def warn(message: str) -> str:
     :param message: The message that you want to format as a warning.
     :return: The given message, with a yellow warning string at the beginning.
     """
+    if type(message) is not str:
+        raise TypeError(
+            "Cannot create warning message for type: " + repr(type(message))
+        )
+
+    if len(message) == 0:
+        raise RuntimeError("Cannot create warning message for empty string.")
+
     return typer.style("WARN", fg=typer.colors.YELLOW, bold=True) + ": " + message
