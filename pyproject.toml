@@ -12,7 +12,7 @@ janitor = "janitor.main:main"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-pandoc = "^2.1"
+pandoc = "^2.2"
 typer = "^0.4.1"
 
 [tool.poetry.dev-dependencies]
