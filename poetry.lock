@@ -107,7 +107,7 @@ pyparsing = ">=2.0.2,<3.0.5 || >3.0.5"
 
 [[package]]
 name = "pandoc"
-version = "2.1"
+version = "2.2"
 description = "Pandoc Documents for Python"
 category = "main"
 optional = false
@@ -299,7 +299,7 @@ testing = ["coverage (>=4)", "coverage-enable-subprocess (>=1)", "flaky (>=3)", 
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "32a3ad5b42cd603227bf7505fad6b215d1103a0b0ab7cba1df2b0d57bc747eb5"
+content-hash = "fb8ef4254e42d85b2992df52ba76d471fc17ca77153d8a13c06d66562b7cd938"
 
 [metadata.files]
 atomicwrites = [
@@ -347,7 +347,7 @@ packaging = [
     {file = "packaging-21.3.tar.gz", hash = "sha256:dd47c42927d89ab911e606518907cc2d3a1f38bbd026385970643f9c5b8ecfeb"},
 ]
 pandoc = [
-    {file = "pandoc-2.1.tar.gz", hash = "sha256:5385d81a2176237e3c48e9719ab661c7046ec5b24db5f138332f189cd7793b87"},
+    {file = "pandoc-2.2.tar.gz", hash = "sha256:d063ee252f2761010f16cf3a14912ad9245187c24c56f4b1ad9696e104fe6e1e"},
 ]
 platformdirs = [
     {file = "platformdirs-2.5.1-py3-none-any.whl", hash = "sha256:bcae7cab893c2d310a711b70b24efb93334febe65f8de776ee320b517471e227"},
