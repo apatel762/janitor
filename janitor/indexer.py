@@ -2,7 +2,7 @@ import json
 import os
 from os import PathLike
 from pathlib import Path
-from typing import List
+from typing import List, Set
 from typing import Optional
 
 import typer
@@ -14,7 +14,6 @@ class NoteIndexerError(Exception):
     """
     Thrown whenever there is an error performing an action within the Index.
     """
-
     pass
 
 
@@ -26,6 +25,7 @@ class Index:
 
     def __init__(self) -> None:
         self.__notes: List[Note] = []
+        self.registered_gatherers: Set[str] = set()
 
     def register(self, note: Note) -> None:
         """

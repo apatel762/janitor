@@ -1,6 +1,5 @@
 import hashlib
-from abc import ABC
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from functools import cache
 from typing import Any
 from typing import Optional
@@ -49,16 +48,41 @@ class Gatherer(ABC):
         """
         return pandoc.read(file=note.path.path, format="markdown")
 
-    @abstractmethod
     def apply(self, index: Index, note: Note) -> bool:
+        if not self.validate_gathering_order(index):
+            raise GathererError('Invalid gathering order on ' + self.__class__.__name__)
+
+        self.register_with_index(index)
+        return self.do_apply(index, note)
+
+    @abstractmethod
+    def do_apply(self, index: Index, note: Note) -> bool:
         """
         This method should be overridden by subclasses to implement the
         'gathering' logic.
+
+        The #apply function should be used by external callers.
 
         :param index: The Note Index.
         :param note: A Markdown Note object to gather information from.
         """
         raise NotImplementedError("Use a subclass!")
+
+    def validate_gathering_order(self, index: Index) -> bool:
+        """
+        This method should be overridden by subclasses to implement any
+        checks around whether the gatherer is being run in the correct
+        order or not.
+
+        By default, we return True as we are assuming that most gatherers
+        don't care about the order in which they are used.
+
+        :param index: The Note Index.
+        """
+        return True
+
+    def register_with_index(self, index):
+        index.registered_gatherers.add(self.__class__.__name__)
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}[{id(self)}]"
@@ -69,15 +93,12 @@ class BacklinkGatherer(Gatherer):
     A gatherer that will detect all backlinks for a Note. It works by scanning
     all the forward links for every Note in the Index and storing the inverse
     backlink information from that.
-
-    NOTE: This gatherer should be used AFTER the ForwardLinkGatherer or else
-    it will report everything as a broken link.
     """
 
     def __init__(self) -> None:
         pass
 
-    def apply(self, index: Index, note: Note) -> bool:
+    def do_apply(self, index: Index, note: Note) -> bool:
         """
         Using the Index, register backlinks for any Notes that are mentioned
         by the Note that we are currently processing.
@@ -99,6 +120,16 @@ class BacklinkGatherer(Gatherer):
 
             # add the NoteLink as a backlink in the other note
             other_note.backlinks.add(link)
+
+        return True
+
+    def validate_gathering_order(self, index: Index) -> bool:
+        """
+        This gatherer should be used AFTER the ForwardLinkGatherer or else
+        it will report everything as a broken link.
+        """
+        if ForwardLinkGatherer.__name__ not in index.registered_gatherers:
+            return False
 
         return True
 
@@ -135,6 +166,7 @@ class ForwardLinkGatherer(Gatherer):
         Determine whether a given Pandoc tree element is a Link.
 
         :param elt: The Pandoc tree element.
+        :param n: The Note from which the given element originates from
         :return: True if the element is a Link, otherwise False.
         """
         if not isinstance(elt, Link):
@@ -152,7 +184,7 @@ class ForwardLinkGatherer(Gatherer):
             and "http" not in link_target
         )
 
-    def apply(self, index: Index, note: Note) -> bool:
+    def do_apply(self, index: Index, note: Note) -> bool:
         """
         Scan the contents of a Note, find all Forward Links and store them
         in the given Note.
@@ -199,7 +231,7 @@ class Sha256ChecksumGatherer(Gatherer):
     def __init__(self) -> None:
         pass
 
-    def apply(self, index: Index, note: Note) -> bool:
+    def do_apply(self, index: Index, note: Note) -> bool:
         """
         Calculate the SHA-256 checksum for the contents of the given Note and
         store the Hex digest in the Note object.

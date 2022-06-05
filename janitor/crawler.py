@@ -1,5 +1,6 @@
 import hashlib
 import os
+import time
 from functools import cache
 from os import DirEntry
 from pathlib import Path
@@ -61,15 +62,12 @@ class Crawler:
                 # gather information about it
                 self.index.register(note)
 
-        # use a progress bar to provide feedback for the user as this
-        # could be quite slow depending on how many notes the user has...
-        # (takes about 30 seconds for me, and I have about 400 Notes)
-        with typer.progressbar(self.index) as pb:
-            # TODO: GH-5 swap these loops so that one Gatherer completely
-            #  finishes before the next one starts
-            for note in pb:  # type: Note
-                for gatherer in self.gatherers:  # type: Gatherer
-                    gatherer.apply(self.index, note)
+        for gatherer in self.gatherers:  # type: Gatherer
+            t0 = time.time()
+            for note in self.index:  # type: Note
+                gatherer.apply(self.index, note)
+            t1 = time.time()
+            typer.echo(f"{gatherer.__class__.__name__:<22} took {t1-t0:<22} seconds")
 
         # persist the index to the filesystem so that the other commands can
         # read the data
