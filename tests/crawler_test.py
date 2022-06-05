@@ -1,3 +1,4 @@
+from os import PathLike
 from pathlib import Path
 
 import pytest
@@ -16,6 +17,22 @@ def test_crawler__when_created__repr_string_shows_size() -> None:
     crawler: Crawler = Crawler(crawl_dir=Path())
 
     assert repr(crawler) == "Crawler[.]"
+
+
+def test_crawler__validate_entry__returns_true_when_markdown_file() -> None:
+    crawler: Crawler = Crawler(crawl_dir=Path())
+    valid: PathLike = Path('./notes/note1.md')
+
+    # noinspection PyTypeChecker
+    assert crawler.validate_entry(valid) is True
+
+
+def test_crawler__validate_entry__returns_false_when_not_markdown_file() -> None:
+    crawler: Crawler = Crawler(crawl_dir=Path())
+    invalid: PathLike = Path('./notes/')
+
+    # noinspection PyTypeChecker
+    assert crawler.validate_entry(invalid) is False
 
 
 def test_get_cache_directory() -> None:
