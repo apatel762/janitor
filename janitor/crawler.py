@@ -69,9 +69,7 @@ class Crawler:
             for note in self.index:  # type: Note
                 gatherer.apply(self.index, note)
             t1 = time.time()
-            typer.echo(
-                f"  {gatherer.__class__.__name__:<22} took {t1 - t0:<22} seconds"
-            )
+            typer.echo(f"  {repr(gatherer):<30} took {t1 - t0:<10.5f} seconds")
 
         for broken_link in self.index.broken_links:
             typer.echo(warn(f"broken link: {broken_link}."))

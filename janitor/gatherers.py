@@ -71,7 +71,7 @@ class Gatherer(ABC):
         index.registered_gatherers.add(self.__class__.__name__)
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}[{id(self)}]"
+        return "Gatherer"
 
 
 class BacklinkGatherer(Gatherer):
@@ -116,6 +116,9 @@ class BacklinkGatherer(Gatherer):
             return False
 
         return True
+
+    def __repr__(self) -> str:
+        return "Gatherer for Backlinks"
 
 
 class ForwardLinkGatherer(Gatherer):
@@ -164,6 +167,9 @@ class ForwardLinkGatherer(Gatherer):
 
         return len(note.forward_links) > 0
 
+    def __repr__(self) -> str:
+        return "Gatherer for Forward Links"
+
 
 class Sha256ChecksumGatherer(Gatherer):
     """
@@ -192,6 +198,9 @@ class Sha256ChecksumGatherer(Gatherer):
 
         return True
 
+    def __repr__(self) -> str:
+        return "Gatherer for SHA256 Checksums"
+
 
 class ModifiedTimeGatherer(Gatherer):
     """
@@ -213,6 +222,9 @@ class ModifiedTimeGatherer(Gatherer):
         )
 
         return True
+
+    def __repr__(self) -> str:
+        return "Gatherer for File mtimes"
 
 
 class NoteTitleGatherer(Gatherer):
@@ -244,6 +256,9 @@ class NoteTitleGatherer(Gatherer):
 
         return True
 
+    def __repr__(self) -> str:
+        return "Gatherer for Note Titles"
+
 
 class OrphanNoteGatherer(Gatherer):
     """
@@ -274,3 +289,6 @@ class OrphanNoteGatherer(Gatherer):
             return False
 
         return True
+
+    def __repr__(self) -> str:
+        return "Gatherer for Orphan Notes"
