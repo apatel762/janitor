@@ -1,3 +1,4 @@
+import datetime
 import hashlib
 import os
 import time
@@ -67,10 +68,13 @@ class Crawler:
             for note in self.index:  # type: Note
                 gatherer.apply(self.index, note)
             t1 = time.time()
-            typer.echo(f"  {gatherer.__class__.__name__:<22} took {t1-t0:<22} seconds")
+            typer.echo(
+                f"  {gatherer.__class__.__name__:<22} took {t1 - t0:<22} seconds"
+            )
 
         # persist the index to the filesystem so that the other commands can
         # read the data
+        self.index.scan_time = datetime.datetime.now(tz=datetime.timezone.utc)
         self.index.dump(location=self.get_cache_directory())
 
     def __repr__(self) -> str:
