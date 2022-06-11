@@ -1,4 +1,3 @@
-import os.path
 from pathlib import Path
 
 import pytest
@@ -22,42 +21,6 @@ def test_index__when_register_invalid_type__raises_error() -> None:
     with pytest.raises(NoteIndexerError):
         # noinspection PyTypeChecker
         index.register(None)
-
-
-def test_index__serialise_has_correct_structure__with_empty_index() -> None:
-    index: Index = Index()
-
-    assert index.serialise() == {}
-
-
-def test_index__serialise_has_correct_structure__with_populated_index() -> None:
-    index: Index = Index()
-    note: Note = Note(Path("./notes/note1.md"))
-    note.sha256_checksum = "my-really-secure-checksum-123456789"
-    index.register(note)
-
-    index_as_json: dict = index.serialise()
-
-    # only one note in the index
-    assert len(index_as_json) == 1
-
-    # the entry is keyed on the note's file name
-    assert note.path.name in index_as_json
-
-    # the entry has 3 values
-    assert len(index_as_json[note.path.name]) == 3
-    assert "links" in index_as_json[note.path.name]
-    assert "path" in index_as_json[note.path.name]
-    assert "sha256" in index_as_json[note.path.name]
-    assert index_as_json[note.path.name]["path"] == os.path.abspath(note.path)
-    assert index_as_json[note.path.name]["sha256"] == note.sha256_checksum
-
-    # the link entry has 2 values, both empty
-    assert len(index_as_json[note.path.name]["links"]) == 2
-    assert "back" in index_as_json[note.path.name]["links"]
-    assert "forward" in index_as_json[note.path.name]["links"]
-    assert len(index_as_json[note.path.name]["links"]["back"]) == 0
-    assert len(index_as_json[note.path.name]["links"]["forward"]) == 0
 
 
 def test_index__search_for_note_with_None__raises_error() -> None:

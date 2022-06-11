@@ -56,7 +56,7 @@ class Crawler:
                 if not self.validate_entry(entry):
                     continue
 
-                note: Note = Note(path=entry)
+                note: Note = Note(path=Path(entry))
 
                 # ensure that the Index is aware of this Note before we
                 # gather information about it
@@ -67,7 +67,7 @@ class Crawler:
             for note in self.index:  # type: Note
                 gatherer.apply(self.index, note)
             t1 = time.time()
-            typer.echo(f"{gatherer.__class__.__name__:<22} took {t1-t0:<22} seconds")
+            typer.echo(f"  {gatherer.__class__.__name__:<22} took {t1-t0:<22} seconds")
 
         # persist the index to the filesystem so that the other commands can
         # read the data

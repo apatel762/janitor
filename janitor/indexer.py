@@ -1,9 +1,10 @@
-import json
 import os
+import pickle
 from os import PathLike
 from pathlib import Path
-from typing import List, Set
+from typing import List
 from typing import Optional
+from typing import Set
 
 import typer
 
@@ -14,6 +15,7 @@ class NoteIndexerError(Exception):
     """
     Thrown whenever there is an error performing an action within the Index.
     """
+
     pass
 
 
@@ -52,28 +54,13 @@ class Index:
                 "Cannot dump the Index to disk without providing a location first."
             )
 
-        target_location: PathLike = Path(os.path.join(location, "index.json"))
+        target_location: PathLike = Path(os.path.join(location, "index.pickle"))
         typer.echo(f"Dumping {self} to: {target_location}")
 
-        # serialise all the notes and construct the JSON index
-        index_as_json: dict = self.serialise()
-
-        with open(target_location, "w", encoding="utf-8") as f:
-            json.dump(index_as_json, f, ensure_ascii=False, indent=4)
+        with open(target_location, "wb") as f:
+            pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
 
         return True
-
-    def serialise(self) -> dict:
-        """
-        Transforms the Index and its contents into a JSON structure
-
-        :return: A dictionary object representing the JSON structure of the Index.
-        """
-        index_as_json: dict = {
-            os.path.basename(note.path): note.serialise() for note in self.__notes
-        }
-
-        return index_as_json
 
     def search_for_note(self, file_name: str) -> Optional[Note]:
         """
@@ -106,3 +93,8 @@ class Index:
         size: int = len(self.__notes)
 
         return f"{name}.empty" if size == 0 else f"{name}(size={size})"
+
+
+def load(path: PathLike) -> Index:
+    with open(path, "rb") as f:
+        return pickle.load(f)

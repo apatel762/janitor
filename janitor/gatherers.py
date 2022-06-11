@@ -48,7 +48,7 @@ class Gatherer(ABC):
         :param note: A Markdown Note object to parse.
         :return: The Pandoc abstract syntax tree of the object.
         """
-        return pandoc.read(file=note.path.path, format="markdown")
+        return pandoc.read(file=note.path, format="markdown")
 
     def apply(self, index: Index, note: Note) -> bool:
         if not self.validate_gathering_order(index):
