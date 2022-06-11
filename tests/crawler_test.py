@@ -22,9 +22,6 @@ def test_crawler__when_created__repr_string_shows_size() -> None:
 def test_crawler__validate_entry__returns_true_when_markdown_file() -> None:
     crawler: Crawler = Crawler(crawl_dir=Path())
     valid: PathLike = Path('./tests/notes/note1.md')
-    print(valid)
-    import os
-    print(os.path.join(os.getcwd(), valid))
 
     # noinspection PyTypeChecker
     assert crawler.validate_entry(valid) is True
