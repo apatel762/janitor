@@ -21,7 +21,7 @@ def test_crawler__when_created__repr_string_shows_size() -> None:
 
 def test_crawler__validate_entry__returns_true_when_markdown_file() -> None:
     crawler: Crawler = Crawler(crawl_dir=Path())
-    valid: PathLike = Path('./tests/notes/note1.md')
+    valid: PathLike = Path("./tests/notes/note1.md")
 
     # noinspection PyTypeChecker
     assert crawler.validate_entry(valid) is True
@@ -29,7 +29,7 @@ def test_crawler__validate_entry__returns_true_when_markdown_file() -> None:
 
 def test_crawler__validate_entry__returns_false_when_not_markdown_file() -> None:
     crawler: Crawler = Crawler(crawl_dir=Path())
-    invalid: PathLike = Path('./notes/')
+    invalid: PathLike = Path("./notes/")
 
     # noinspection PyTypeChecker
     assert crawler.validate_entry(invalid) is False
@@ -37,6 +37,6 @@ def test_crawler__validate_entry__returns_false_when_not_markdown_file() -> None
 
 def test_get_cache_directory() -> None:
     crawler: Crawler = Crawler(crawl_dir=Path())
-    directory: Path = crawler.get_cache_directory()
+    directory: Path = crawler.get_cache_directory(crawler.crawl_dir)
 
     assert ".cache" and "janitor" in str(directory.resolve())

@@ -14,7 +14,7 @@ def test_scan__when_invalid_folder__aborts() -> None:
 
 
 def test_scan__when_continue__begins_scan() -> None:
-    result = runner.invoke(app, ["scan", "."], input="y\n")
+    result = runner.invoke(app, ["scan", ".", "--force-index-rebuild"], input="y\n")
 
     assert "Will index folder:" in result.stdout
     assert "Would you like to continue? [y/N]: y\n" in result.stdout

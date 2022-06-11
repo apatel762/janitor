@@ -2,8 +2,8 @@ import datetime
 import hashlib
 import os
 import time
-from functools import cache
 from os import DirEntry
+from os import PathLike
 from pathlib import Path
 from typing import List
 
@@ -27,7 +27,9 @@ class Crawler:
 
         self.crawl_dir: Path = crawl_dir
         self.index: Index = (
-            Index() if should_rebuild else Index.load(self.get_cache_directory())
+            Index()
+            if should_rebuild
+            else Index.load(self.get_cache_directory(base_dir=crawl_dir))
         )
         self.gatherers: List[Gatherer] = []
         self.__is_fresh_index: bool = should_rebuild
@@ -35,8 +37,8 @@ class Crawler:
     def validate_entry(self, entry: DirEntry) -> bool:
         return entry.is_file() and entry.name.endswith(".md")
 
-    @cache
-    def get_cache_directory(self) -> Path:
+    @staticmethod
+    def get_cache_directory(base_dir: PathLike) -> Path:
         """
         Creates a directory that will be used as a cache. All unimportant files
         (i.e. files that can be re-created) will be stored in this folder.
@@ -49,7 +51,7 @@ class Crawler:
         """
         cache_home: str = os.getenv("XDG_CACHE_HOME", os.path.expanduser("~/.cache"))
         cache_partition_key: str = hashlib.sha256(
-            os.path.abspath(self.crawl_dir).encode()
+            os.path.abspath(base_dir).encode()
         ).hexdigest()
 
         cache_path: Path = Path(f"{cache_home}/janitor/{cache_partition_key}")
@@ -106,7 +108,7 @@ class Crawler:
 
         # persist the index to the filesystem so that the other commands can
         # read the data
-        self.index.dump(location=self.get_cache_directory())
+        self.index.dump(location=self.get_cache_directory(self.crawl_dir))
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}[{self.crawl_dir}]"
