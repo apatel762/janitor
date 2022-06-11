@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import typer
@@ -60,6 +61,61 @@ def scan(
     crawler.gatherers.append(BacklinkGatherer())
     crawler.go()
 
+    raise typer.Exit()
+
+
+@app.command(
+    short_help="Convert your notes to HTML.",
+    help=(
+        "Convert the notes in a scanned folder to HTML files. A custom stylesheet will be applied to the notes "
+        "automatically."
+    ),
+)
+def publish(
+    folder: Path = typer.Argument(
+        ...,
+        help="The folder containing all of your Markdown (*.md) notes.",
+        envvar="JANITOR_NOTES_FOLDER",
+        exists=True,
+        file_okay=False,
+        dir_okay=True,
+        readable=True,
+        resolve_path=True,
+    ),
+    destination: Path = typer.Argument(
+        Path(os.path.expanduser("~/Documents/Notes/.publish")),
+        help="The folder that your published notes will be saved to.",
+        envvar="JANITOR_DESTINATION_FOLDER",
+        exists=True,
+        file_okay=False,
+        dir_okay=True,
+        readable=True,
+        resolve_path=True,
+    ),
+) -> None:
+    # 0) download https://raw.githubusercontent.com/hawkz/gdcss/master/gd.css if not present
+    #      to destination/css/main.css
+    # 0) offer to do scan if cannot find index?
+    #      put --assume-yes back if this gets implemented
+    # 1) read the index
+    # 2) if file was modified since last script runtime, queue it for publishing
+    # 3) do pandoc conversion (use pandoc.write https://boisgera.github.io/pandoc/api/#pandoc)
+    #      command:
+    #        pandoc
+    #        filename.md
+    #        --metadata=author:getpass.getuser()
+    #        --metadata=lang:en-GB
+    #        --metadata=charset:utf-8
+    #        --metadata=pagetitle:(get the page title somehow)
+    #        --no-highlight
+    #        --css=css/main.css
+    #        --from=markdown
+    #        --to=html
+    #        --id-prefix=(create some sort of footnote id prefix using file name)
+    #        --output=filename.html
+    # TODO: re-implement filters from old static site generator?
+    # TODO: figure out how to customise favicon
+    # 4) generate and publish an index file (if not present in notes)
     raise typer.Exit()
 
 
