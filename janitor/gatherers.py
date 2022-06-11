@@ -44,7 +44,7 @@ class Gatherer(ABC):
         and `tree[1]` will give you the subtree with the actual text.
 
         :param note: A Markdown Note object to parse.
-        :return: The Pandoc abstract sytax tree of the object.
+        :return: The Pandoc abstract syntax tree of the object.
         """
         return pandoc.read(file=note.path.path, format="markdown")
 
