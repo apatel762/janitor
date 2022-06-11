@@ -11,7 +11,7 @@ repository = "https://github.com/apatel762/janitor"
 janitor = "janitor.main:main"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
 pandoc = "^2.2"
 typer = "^0.4.1"
 

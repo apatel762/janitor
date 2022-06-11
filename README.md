@@ -9,7 +9,7 @@ The name of the project ('janitor') is inspired by the ['note-link-janitor'](htt
 ## Requirements
 
 - You must have `pandoc` installed on your machine.
-- Python ^3.9
+- Python ^3.10
 
 ## Installation
 
