@@ -14,13 +14,13 @@ def test_crawler__no_dir_provided__raises_crawler_error() -> None:
 
 
 def test_crawler__when_created__repr_string_shows_size() -> None:
-    crawler: Crawler = Crawler(crawl_dir=Path())
+    crawler: Crawler = Crawler(crawl_dir=Path(), should_rebuild=True)
 
     assert repr(crawler) == "Crawler[.]"
 
 
 def test_crawler__validate_entry__returns_true_when_markdown_file() -> None:
-    crawler: Crawler = Crawler(crawl_dir=Path())
+    crawler: Crawler = Crawler(crawl_dir=Path(), should_rebuild=True)
     valid: PathLike = Path("./tests/notes/note1.md")
 
     # noinspection PyTypeChecker
@@ -28,7 +28,7 @@ def test_crawler__validate_entry__returns_true_when_markdown_file() -> None:
 
 
 def test_crawler__validate_entry__returns_false_when_not_markdown_file() -> None:
-    crawler: Crawler = Crawler(crawl_dir=Path())
+    crawler: Crawler = Crawler(crawl_dir=Path(), should_rebuild=True)
     invalid: PathLike = Path("./notes/")
 
     # noinspection PyTypeChecker
@@ -36,7 +36,7 @@ def test_crawler__validate_entry__returns_false_when_not_markdown_file() -> None
 
 
 def test_get_cache_directory() -> None:
-    crawler: Crawler = Crawler(crawl_dir=Path())
+    crawler: Crawler = Crawler(crawl_dir=Path(), should_rebuild=True)
     directory: Path = crawler.get_cache_directory(crawler.crawl_dir)
 
     assert ".cache" and "janitor" in str(directory.resolve())
