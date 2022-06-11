@@ -14,10 +14,11 @@ class Note:
         :param path: A path to the Note file where this Note is stored.
         """
         self.path: PathLike = path
-        self.backlinks: Set[NoteLink] = set()
-        self.forward_links: Set[NoteLink] = set()
+        self.title: Optional[str] = None
         self.sha256_checksum: Optional[str] = None
         self.last_modified: Optional[datetime] = None
+        self.backlinks: Set[NoteLink] = set()
+        self.forward_links: Set[NoteLink] = set()
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}[{'None' if self.path is None else self.path.name}]"

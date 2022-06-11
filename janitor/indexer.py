@@ -1,3 +1,4 @@
+import datetime
 import os
 import pickle
 from os import PathLike
@@ -27,6 +28,9 @@ class Index:
 
     def __init__(self) -> None:
         self.__notes: List[Note] = []
+        self.scan_time: datetime.datetime = datetime.datetime.now(
+            tz=datetime.timezone.utc
+        )
         self.registered_gatherers: Set[str] = set()
 
     def register(self, note: Note) -> None:

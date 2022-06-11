@@ -2,19 +2,19 @@ import datetime
 import hashlib
 from abc import ABC
 from abc import abstractmethod
-from functools import cache
-from typing import Any
 from typing import Optional
 
 import pandoc
 import typer
-from pandoc.types import Header
-from pandoc.types import Link
 from pandoc.types import Pandoc
 
 from .indexer import Index
 from .notes import Note
 from .notes import NoteLink
+from .pandocutils import is_backlinks_header
+from .pandocutils import is_header
+from .pandocutils import is_link_to_another_note
+from .pandocutils import parse_abstract_syntax_tree
 from .typerutils import warn
 
 
@@ -35,20 +35,6 @@ class Gatherer(ABC):
     The information should be recorded into the Note (you should assume
     that all the Gatherers will mutate the Note that you give it).
     """
-
-    @cache
-    def parse_abstract_syntax_tree(self, note: Note) -> Pandoc:
-        """
-        Uses the pandoc library to convert a given Markdown Note into a
-        Pandoc-flavoured Markdown Abstract Syntax Tree.
-
-        NOTE: from the result, `tree[0]` will give you the metadata
-        and `tree[1]` will give you the subtree with the actual text.
-
-        :param note: A Markdown Note object to parse.
-        :return: The Pandoc abstract syntax tree of the object.
-        """
-        return pandoc.read(file=note.path, format="markdown")
 
     def apply(self, index: Index, note: Note) -> bool:
         if not self.validate_gathering_order(index):
@@ -145,47 +131,6 @@ class ForwardLinkGatherer(Gatherer):
     def __init__(self) -> None:
         pass
 
-    def is_backlinks_header(self, elt: Any) -> bool:
-        """
-        Determine whether a given Pandoc tree element is the backlinks Header.
-
-        :param elt: The Pandoc tree element.
-        :return: True if the element is the backlinks Header, otherwise False.
-        """
-        if not isinstance(elt, Header):
-            return False
-
-        # all backlinks headers are H2, so if we aren't looking at a
-        # level 2 header, we can leave
-        if elt[0] != 2:
-            return False
-
-        header_text: str = pandoc.write(elt[2]).strip()
-        return header_text == "Backlinks"
-
-    def is_link_to_another_note(self, elt: Any, n: Note) -> bool:
-        """
-        Determine whether a given Pandoc tree element is a Link.
-
-        :param elt: The Pandoc tree element.
-        :param n: The Note from which the given element originates from
-        :return: True if the element is a Link, otherwise False.
-        """
-        if not isinstance(elt, Link):
-            return False
-
-        # for a Link element, it's the third thing which holds the
-        # link target (first thing is the attrs and second is the alt
-        # text, if any)
-        link_target: str = "".join(elt[2])
-
-        return (
-            link_target != n.path.name
-            and link_target.endswith(".md")
-            and not link_target.startswith(".")
-            and "http" not in link_target
-        )
-
     def do_apply(self, index: Index, note: Note) -> bool:
         """
         Scan the contents of a Note, find all Forward Links and store them
@@ -195,16 +140,16 @@ class ForwardLinkGatherer(Gatherer):
         :param note: The Note that you want to search.
         :return: True if any Forward Links were found, otherwise False.
         """
-        tree: Pandoc = self.parse_abstract_syntax_tree(note)
+        tree: Pandoc = parse_abstract_syntax_tree(note)
 
         for element, path in pandoc.iter(tree[1], path=True):
             # don't want to include any links that come after the Backlinks
             # header (if any) so if we see that we've got to stop
-            if self.is_backlinks_header(element):
+            if is_backlinks_header(element):
                 break
 
             # don't care about anything that isn't a link
-            if not self.is_link_to_another_note(element, note):
+            if not is_link_to_another_note(element, note):
                 continue
 
             # we want to also record the context of every link
@@ -264,11 +209,41 @@ class ModifiedTimeGatherer(Gatherer):
         """
         :param index: The Note Index.
         :param note: The Note that you want to calculate a checksum for.
-        :return: True if the checksum was calculated successfully, otherwise False.
+        :return: True if the mtime was found, otherwise False.
         """
         file_mtime: float = note.path.stat().st_mtime
         note.last_modified = datetime.datetime.fromtimestamp(
             file_mtime, tz=datetime.timezone.utc
         )
+
+        return True
+
+
+class NoteTitleGatherer(Gatherer):
+    """
+    A gatherer for retrieving the title of a given note.
+    """
+
+    def __init__(self) -> None:
+        pass
+
+    def do_apply(self, index: Index, note: Note) -> bool:
+        """
+        :param index: The Note Index.
+        :param note: The Note that you want to calculate a checksum for.
+        :return: True if the note title was found, otherwise False.
+        """
+        tree: Pandoc = parse_abstract_syntax_tree(note)
+
+        for element, path in pandoc.iter(tree[1], path=True):
+            # don't want to include any links that come after the Backlinks
+            # header (if any) so if we see that we've got to stop
+            if not is_header(element, level=1):
+                continue
+
+            # the header text is the third part of the header element, so
+            # we need to use `[2]` to extract it, and we need to tell Pandoc
+            # to convert it from it's AST format back to a string.
+            note.title = pandoc.write(element[2]).replace("\n", "")
 
         return True
