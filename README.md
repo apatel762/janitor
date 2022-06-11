@@ -2,6 +2,8 @@
 
 [![PyTest](https://github.com/apatel762/janitor/actions/workflows/pytest.yml/badge.svg)](https://github.com/apatel762/janitor/actions/workflows/pytest.yml) [![CodeQL](https://github.com/apatel762/janitor/actions/workflows/codeql.yml/badge.svg)](https://github.com/apatel762/janitor/actions/workflows/codeql.yml)
 
+**WORK IN PROGRESS** (nothing really works yet)
+
 A program for performing checks on, and enhancing, my markdown notes.
 
 The name of the project ('janitor') is inspired by the ['note-link-janitor'](https://github.com/andymatuschak/note-link-janitor) by Andy Matuschak. I'm using this repo to maintain my own version of his scripts because I want to support regular Markdown links (instead of Wikilinks) and I want to have the 'janitor' to extra checks like looking for dead links.
