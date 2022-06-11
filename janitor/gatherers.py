@@ -231,7 +231,7 @@ class NoteTitleGatherer(Gatherer):
         """
         tree: Pandoc = parse_abstract_syntax_tree(note)
 
-        for element, path in pandoc.iter(tree[1], path=True):
+        for element in pandoc.iter(tree[1]):
             # don't want to include any links that come after the Backlinks
             # header (if any) so if we see that we've got to stop
             if not is_header(element, level=1):
