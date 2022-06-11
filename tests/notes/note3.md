@@ -28,7 +28,7 @@ est harundine fretum [naturaeque tuearis Aulide](#populis). Canibus sibi invita
 esse flores, lustrabere ingemit Leucothoeque supervolat Iuppiter nec! Posita
 quoque iaculatricemque partibus: militiae et quae, qui inmensos Iovis. Vir
 spolium turbamque premis quorum indicet naris pollice, ego Appenninigenae rerum
-et.
+et. [Ibi fatis](note3_broken_link.md)
 
 ## Dixi gutture
 

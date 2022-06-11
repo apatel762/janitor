@@ -12,6 +12,7 @@ import typer
 from .gatherers import Gatherer
 from .indexer import Index
 from .notes import Note
+from .typerutils import warn
 
 
 class CrawlerError(Exception):
@@ -71,6 +72,9 @@ class Crawler:
             typer.echo(
                 f"  {gatherer.__class__.__name__:<22} took {t1 - t0:<22} seconds"
             )
+
+        for broken_link in self.index.broken_links:
+            typer.echo(warn(f"broken link: {broken_link}."))
 
         # persist the index to the filesystem so that the other commands can
         # read the data

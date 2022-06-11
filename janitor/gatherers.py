@@ -5,7 +5,6 @@ from abc import abstractmethod
 from typing import Optional
 
 import pandoc
-import typer
 from pandoc.types import Pandoc
 
 from .indexer import Index
@@ -15,7 +14,6 @@ from .pandocutils import is_backlinks_header
 from .pandocutils import is_header
 from .pandocutils import is_link_to_another_note
 from .pandocutils import parse_abstract_syntax_tree
-from .typerutils import warn
 
 
 class GathererError(Exception):
@@ -81,6 +79,8 @@ class BacklinkGatherer(Gatherer):
     A gatherer that will detect all backlinks for a Note. It works by scanning
     all the forward links for every Note in the Index and storing the inverse
     backlink information from that.
+
+    Will also check for broken links.
     """
 
     def __init__(self) -> None:
@@ -100,14 +100,10 @@ class BacklinkGatherer(Gatherer):
                 file_name=link.destination_file_name
             )
             if other_note is None:
-                # TODO: should there be a separate broken link checker to pick
-                #  these up or should I just handle it here?? separate checker
-                #  would be nice to keep things clean but handling it here would
-                #  be faster
-                typer.echo(warn(f"Possible broken link: {link}."))
-
-            # add the NoteLink as a backlink in the other note
-            other_note.backlinks.add(link)
+                index.broken_links.append(link)
+            else:
+                # add the NoteLink as a backlink in the other note
+                other_note.backlinks.add(link)
 
         return True
 

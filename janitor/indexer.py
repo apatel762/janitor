@@ -10,6 +10,7 @@ from typing import Set
 import typer
 
 from .notes import Note
+from .notes import NoteLink
 
 
 class NoteIndexerError(Exception):
@@ -30,6 +31,7 @@ class Index:
         self.__notes: List[Note] = []
         self.scan_time: Optional[datetime.datetime] = None
         self.registered_gatherers: Set[str] = set()
+        self.broken_links: List[NoteLink] = []
 
     def register(self, note: Note) -> None:
         """
