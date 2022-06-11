@@ -1,5 +1,7 @@
+import datetime
 import hashlib
-from abc import ABC, abstractmethod
+from abc import ABC
+from abc import abstractmethod
 from functools import cache
 from typing import Any
 from typing import Optional
@@ -50,7 +52,7 @@ class Gatherer(ABC):
 
     def apply(self, index: Index, note: Note) -> bool:
         if not self.validate_gathering_order(index):
-            raise GathererError('Invalid gathering order on ' + self.__class__.__name__)
+            raise GathererError("Invalid gathering order on " + self.__class__.__name__)
 
         self.register_with_index(index)
         return self.do_apply(index, note)
@@ -246,5 +248,27 @@ class Sha256ChecksumGatherer(Gatherer):
                 file_hash.update(chunk)
 
             note.sha256_checksum = file_hash.hexdigest()
+
+        return True
+
+
+class ModifiedTimeGatherer(Gatherer):
+    """
+    A gatherer for retrieving the 'last modified' time for a given note.
+    """
+
+    def __init__(self) -> None:
+        pass
+
+    def do_apply(self, index: Index, note: Note) -> bool:
+        """
+        :param index: The Note Index.
+        :param note: The Note that you want to calculate a checksum for.
+        :return: True if the checksum was calculated successfully, otherwise False.
+        """
+        file_mtime: float = note.path.stat().st_mtime
+        note.last_modified = datetime.datetime.fromtimestamp(
+            file_mtime, tz=datetime.timezone.utc
+        )
 
         return True

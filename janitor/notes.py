@@ -1,4 +1,5 @@
 import os.path
+from datetime import datetime
 from os import DirEntry
 from os import PathLike
 from typing import Optional
@@ -19,6 +20,7 @@ class Note:
         self.backlinks: Set[NoteLink] = set()
         self.forward_links: Set[NoteLink] = set()
         self.sha256_checksum: Optional[str] = None
+        self.last_modified: Optional[datetime] = None
 
     def serialise(self) -> dict:
         """
