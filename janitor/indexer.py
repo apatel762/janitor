@@ -48,6 +48,12 @@ class Index:
 
         self.__notes.append(note)
 
+    @staticmethod
+    def load(folder_container_the_index: PathLike):
+        file: Path = Path(os.path.join(folder_container_the_index, "index.pickle"))
+        with open(file, "rb") as f:
+            return pickle.load(f)  # type: Index
+
     def dump(self, location: PathLike) -> bool:
         """
         Dump the indexed content to disk in the JSON format.
@@ -98,8 +104,3 @@ class Index:
         size: int = len(self.__notes)
 
         return f"{name}.empty" if size == 0 else f"{name}(size={size})"
-
-
-def load(path: PathLike) -> Index:
-    with open(path, "rb") as f:
-        return pickle.load(f)

@@ -60,12 +60,12 @@ class Gatherer(ABC):
         checks around whether the gatherer is being run in the correct
         order or not.
 
-        By default, we return True as we are assuming that most gatherers
-        don't care about the order in which they are used.
+        By default, we check if the file mtime gatherer has run because
+        that one is the most important.
 
         :param index: The Note Index.
         """
-        return True
+        return ModifiedTimeGatherer.__name__ in index.registered_gatherers
 
     def register_with_index(self, index):
         index.registered_gatherers.add(self.__class__.__name__)
@@ -112,10 +112,7 @@ class BacklinkGatherer(Gatherer):
         This gatherer should be used AFTER the ForwardLinkGatherer or else
         it will report everything as a broken link.
         """
-        if ForwardLinkGatherer.__name__ not in index.registered_gatherers:
-            return False
-
-        return True
+        return ForwardLinkGatherer.__name__ in index.registered_gatherers
 
     def __repr__(self) -> str:
         return "Gatherer for Backlinks"
@@ -223,6 +220,16 @@ class ModifiedTimeGatherer(Gatherer):
 
         return True
 
+    def validate_gathering_order(self, index: Index) -> bool:
+        """
+        Ensure that this one is the first gatherer to run
+        :param index: The Note Index.
+        """
+        return len(index.registered_gatherers) == 0 or (
+            len(index.registered_gatherers) == 1
+            and ModifiedTimeGatherer.__name__ in index.registered_gatherers
+        )
+
     def __repr__(self) -> str:
         return "Gatherer for File mtimes"
 
@@ -253,6 +260,7 @@ class NoteTitleGatherer(Gatherer):
             # we need to use `[2]` to extract it, and we need to tell Pandoc
             # to convert it from it's AST format back to a string.
             note.title = pandoc.write(element[2]).replace("\n", "")
+            break
 
         return True
 
@@ -282,13 +290,10 @@ class OrphanNoteGatherer(Gatherer):
 
     def validate_gathering_order(self, index: Index) -> bool:
         """
-        This gatherer should be used AFTER the ForwardLinkGatherer or else
-        it will report everything as a broken link.
+        This gatherer should be used AFTER the BacklinkGatherer or else
+        it won't be able to see which notes are orphans
         """
-        if BacklinkGatherer.__name__ not in index.registered_gatherers:
-            return False
-
-        return True
+        return BacklinkGatherer.__name__ in index.registered_gatherers
 
     def __repr__(self) -> str:
         return "Gatherer for Orphan Notes"

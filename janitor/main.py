@@ -53,18 +53,21 @@ def scan(
 
     typer.echo("Starting scan...")
 
-    if force_index_rebuild:
-        typer.echo("The '--force-index-rebuild' option is not supported at the moment.")
-        raise typer.Exit(code=1)
-
     # crawl the given folder and build out the index
-    crawler = Crawler(crawl_dir=folder)
+    crawler = Crawler(crawl_dir=folder, should_rebuild=force_index_rebuild)
+
+    # the file mtime gatherer should always go first, because we need it
+    # to run regardless of whether we have the prebuilt index. We use the
+    # file mtime data to decide whether a file is new enough to bother
+    # using the other gatherers on
+    crawler.gatherers.append(ModifiedTimeGatherer())
+
     crawler.gatherers.append(Sha256ChecksumGatherer())
     crawler.gatherers.append(ForwardLinkGatherer())
     crawler.gatherers.append(BacklinkGatherer())
     crawler.gatherers.append(OrphanNoteGatherer())
-    crawler.gatherers.append(ModifiedTimeGatherer())
     crawler.gatherers.append(NoteTitleGatherer())
+
     crawler.go()
 
     raise typer.Exit()
