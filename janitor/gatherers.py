@@ -243,3 +243,34 @@ class NoteTitleGatherer(Gatherer):
             note.title = pandoc.write(element[2]).replace("\n", "")
 
         return True
+
+
+class OrphanNoteGatherer(Gatherer):
+    """
+    A gatherer to detect orphaned notes (i.e. those that have no backlinks and
+    therefore are not mentioned anywhere).
+    """
+
+    def __init__(self) -> None:
+        pass
+
+    def do_apply(self, index: Index, note: Note) -> bool:
+        """
+        :param index: The Note Index.
+        :param note: The Note that you are currently processing.
+        :return: True if the operation was successful, otherwise False
+        """
+        if len(note.backlinks) == 0:
+            index.orphans.append(note)
+
+        return True
+
+    def validate_gathering_order(self, index: Index) -> bool:
+        """
+        This gatherer should be used AFTER the ForwardLinkGatherer or else
+        it will report everything as a broken link.
+        """
+        if BacklinkGatherer.__name__ not in index.registered_gatherers:
+            return False
+
+        return True

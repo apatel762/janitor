@@ -76,6 +76,9 @@ class Crawler:
         for broken_link in self.index.broken_links:
             typer.echo(warn(f"broken link: {broken_link}."))
 
+        for orphan in self.index.orphans:
+            typer.echo(warn(f"orphan: {orphan}."))
+
         # persist the index to the filesystem so that the other commands can
         # read the data
         self.index.scan_time = datetime.datetime.now(tz=datetime.timezone.utc)

@@ -8,6 +8,7 @@ from .gatherers import BacklinkGatherer
 from .gatherers import ForwardLinkGatherer
 from .gatherers import ModifiedTimeGatherer
 from .gatherers import NoteTitleGatherer
+from .gatherers import OrphanNoteGatherer
 from .gatherers import Sha256ChecksumGatherer
 
 app = typer.Typer(
@@ -61,6 +62,7 @@ def scan(
     crawler.gatherers.append(Sha256ChecksumGatherer())
     crawler.gatherers.append(ForwardLinkGatherer())
     crawler.gatherers.append(BacklinkGatherer())
+    crawler.gatherers.append(OrphanNoteGatherer())
     crawler.gatherers.append(ModifiedTimeGatherer())
     crawler.gatherers.append(NoteTitleGatherer())
     crawler.go()

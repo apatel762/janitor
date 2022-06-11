@@ -32,6 +32,7 @@ class Index:
         self.scan_time: Optional[datetime.datetime] = None
         self.registered_gatherers: Set[str] = set()
         self.broken_links: List[NoteLink] = []
+        self.orphans: List[Note] = []
 
     def register(self, note: Note) -> None:
         """
