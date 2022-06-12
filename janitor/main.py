@@ -1,8 +1,11 @@
 import os
 from pathlib import Path
+from typing import Optional
+from typing import Set
 
 import typer
 
+from .checksumutils import sha256_checksum
 from .crawler import Crawler
 from .gatherers import BacklinkGatherer
 from .gatherers import ForwardLinkGatherer
@@ -10,6 +13,11 @@ from .gatherers import ModifiedTimeGatherer
 from .gatherers import NoteTitleGatherer
 from .gatherers import OrphanNoteGatherer
 from .gatherers import Sha256ChecksumGatherer
+from .indexer import Index
+from .notes import Note
+from .pandocutils import maintain_backlinks
+from .typerutils import error
+from .typerutils import warn
 
 app = typer.Typer(
     help="A program for performing checks on, and enhancing, markdown notes."
@@ -61,14 +69,102 @@ def scan(
     # file mtime data to decide whether a file is new enough to bother
     # using the other gatherers on
     crawler.gatherers.append(ModifiedTimeGatherer())
-
     crawler.gatherers.append(Sha256ChecksumGatherer())
+    crawler.gatherers.append(NoteTitleGatherer())
     crawler.gatherers.append(ForwardLinkGatherer())
     crawler.gatherers.append(BacklinkGatherer())
     crawler.gatherers.append(OrphanNoteGatherer())
-    crawler.gatherers.append(NoteTitleGatherer())
 
     crawler.go()
+
+    raise typer.Exit()
+
+
+@app.command(
+    short_help="Put backlinks in notes if not present.",
+    help=(
+        "Maintain backlink structure across your notes. This command is idempotent and can be run many times on the "
+        "same set of notes with the same effect."
+        "\n"
+        "\n"
+        "NOTE: You must use the 'scan' command before this one."
+    ),
+)
+def apply(
+    folder: Path = typer.Argument(
+        ...,
+        help="The folder containing all of your Markdown (*.md) notes.",
+        envvar="JANITOR_NOTES_FOLDER",
+        exists=True,
+        file_okay=False,
+        dir_okay=True,
+        readable=True,
+        resolve_path=True,
+    ),
+    assume_yes: bool = typer.Option(
+        False, "--assume-yes", help="Automatic 'Yes' to every prompt."
+    ),
+    refresh_all_backlinks: bool = typer.Option(
+        False,
+        "--refresh-all-backlinks",
+        help="Refresh all backlinks regardless of when the note was last updated.",
+    ),
+) -> None:
+    cache_dir: Path = Crawler.get_cache_directory(base_dir=folder)
+    try:
+        index: Index = Index.load(folder_containing_the_index=cache_dir)
+    except FileNotFoundError:
+        typer.echo(
+            error(
+                f"Could not find an index for the given folder; please run:\n\n  "
+                f"janitor scan {os.path.abspath(folder)}\n "
+            )
+        )
+        raise typer.Exit(code=1)
+    else:
+        # ask nicely before potentially clobbering notes
+        typer.echo(f"Will maintain backlinks for {len(index)} files.")
+        if not assume_yes:
+            typer.confirm("Would you like to continue?", abort=True)
+
+        # ensure that the notes haven't changed since the last scan
+        for note in index:
+            checksum: str = sha256_checksum(note.path)
+            if checksum != note.sha256_checksum:
+                typer.echo(
+                    error(f"{note} has changed since the last scan! Please re-scan.")
+                )
+                raise typer.Exit(code=1)
+
+        if refresh_all_backlinks:
+            for note in index:
+                maintain_backlinks(note)
+        else:
+            # for better performance on larger collections of notes, we should
+            # only refresh the backlinks for notes that have changed since the
+            # last scan (& the notes that are referenced by the changed notes)
+            notes_to_refresh: Set[Note] = set()
+            for note in index:
+                if note.last_modified < index.scan_time:
+                    continue  # note hasn't changed since last scan
+                else:
+                    notes_to_refresh.add(note)
+                    for forward_link in note.forward_links:
+                        referenced_note: Optional[Note] = index.search_for_note(
+                            forward_link.destination_file_name
+                        )
+                        if note is not None:
+                            notes_to_refresh.add(referenced_note)
+                        else:
+                            typer.echo(
+                                warn(
+                                    f"{note} may have a broken link! "
+                                    f"Please fix and re-scan for the best results."
+                                )
+                            )
+
+            for note in notes_to_refresh:
+                maintain_backlinks(note)
 
     raise typer.Exit()
 
@@ -125,11 +221,6 @@ def publish(
     # TODO: re-implement filters from old static site generator?
     # TODO: figure out how to customise favicon
     # 4) generate and publish an index file (if not present in notes)
-    raise typer.Exit()
-
-
-@app.command()
-def apply() -> None:
     raise typer.Exit()
 
 

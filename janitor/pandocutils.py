@@ -3,6 +3,7 @@ from typing import Any
 from typing import Optional
 
 import pandoc
+import typer
 from pandoc.types import Header
 from pandoc.types import Link
 from pandoc.types import Pandoc
@@ -76,3 +77,42 @@ def is_link_to_another_note(elt: Any, n: Note) -> bool:
         and not link_target.startswith(".")
         and "http" not in link_target
     )
+
+
+def has_backlinks_header(note: Note) -> bool:
+    tree: Pandoc = parse_abstract_syntax_tree(note)
+
+    for element, path in pandoc.iter(tree[1], path=True):
+        if is_backlinks_header(element):
+            return True
+
+    return False
+
+
+def maintain_backlinks(note: Note) -> bool:
+    """
+    :return: True if the backlinks were maintained successfully, otherwise False
+    """
+    typer.echo(f"Maintaining backlinks for {note}")
+    tree: Pandoc = parse_abstract_syntax_tree(note)
+
+    # if there is already a backlinks section in the document, slice everything
+    # from the backlinks section onwards out of the file; we will replace it
+    # below with the up-to-date backlinks
+    if has_backlinks_header(note):
+        for element, path in pandoc.iter(tree[1], path=True):
+            if is_backlinks_header(element):
+                # slice the existing backlinks section out of the tree
+                tree[1] = tree[1][: path[0][1]]
+
+    backlinks_block = pandoc.read(
+        source=note.markdown_backlinks_block, format="markdown"
+    )[1]
+
+    # put the backlink section at the end of the tree
+    for elt in backlinks_block:
+        tree[1].append(elt)
+
+    pandoc.write(doc=tree, file=note.path, format="markdown")
+
+    return True

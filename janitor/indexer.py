@@ -31,8 +31,8 @@ class Index:
         self.__notes: List[Note] = []
         self.scan_time: Optional[datetime.datetime] = None
         self.registered_gatherers: Set[str] = set()
-        self.broken_links: List[NoteLink] = []
-        self.orphans: List[Note] = []
+        self.broken_links: Set[NoteLink] = set()
+        self.orphans: Set[Note] = set()
 
     def register(self, note: Note) -> None:
         """
@@ -49,8 +49,8 @@ class Index:
         self.__notes.append(note)
 
     @staticmethod
-    def load(folder_container_the_index: PathLike):
-        file: Path = Path(os.path.join(folder_container_the_index, "index.pickle"))
+    def load(folder_containing_the_index: PathLike):
+        file: Path = Path(os.path.join(folder_containing_the_index, "index.pickle"))
         with open(file, "rb") as f:
             return pickle.load(f)  # type: Index
 

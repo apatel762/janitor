@@ -1,5 +1,4 @@
 import datetime
-import hashlib
 from abc import ABC
 from abc import abstractmethod
 from typing import Optional
@@ -7,6 +6,7 @@ from typing import Optional
 import pandoc
 from pandoc.types import Pandoc
 
+from .checksumutils import sha256_checksum
 from .indexer import Index
 from .notes import Note
 from .notes import NoteLink
@@ -100,7 +100,7 @@ class BacklinkGatherer(Gatherer):
                 file_name=link.destination_file_name
             )
             if other_note is None:
-                index.broken_links.append(link)
+                index.broken_links.add(link)
             else:
                 # add the NoteLink as a backlink in the other note
                 other_note.backlinks.add(link)
@@ -111,8 +111,14 @@ class BacklinkGatherer(Gatherer):
         """
         This gatherer should be used AFTER the ForwardLinkGatherer or else
         it will report everything as a broken link.
+
+        We also must ensure that the NoteTitleGatherer has run, because we
+        need to have note titles in order to create links.
         """
-        return ForwardLinkGatherer.__name__ in index.registered_gatherers
+        return (
+            NoteTitleGatherer.__name__ in index.registered_gatherers
+            and ForwardLinkGatherer.__name__ in index.registered_gatherers
+        )
 
     def __repr__(self) -> str:
         return "Gatherer for Backlinks"
@@ -156,13 +162,21 @@ class ForwardLinkGatherer(Gatherer):
 
             note.forward_links.add(
                 NoteLink(
-                    origin=note,
+                    origin_note_path=note.path,
+                    origin_note_title=note.title,
                     origin_context=link_context,
                     destination_file_name="".join(element[2]),
                 )
             )
 
         return len(note.forward_links) > 0
+
+    def validate_gathering_order(self, index: Index) -> bool:
+        """
+        We must ensure that the NoteTitleGatherer has run, because we need
+        to have note titles in order to create links.
+        """
+        return NoteTitleGatherer.__name__ in index.registered_gatherers
 
     def __repr__(self) -> str:
         return "Gatherer for Forward Links"
@@ -186,12 +200,7 @@ class Sha256ChecksumGatherer(Gatherer):
         :param note: The Note that you want to calculate a checksum for.
         :return: True if the checksum was calculated successfully, otherwise False.
         """
-        with open(note.path, "rb") as f:
-            file_hash = hashlib.sha256()
-            while chunk := f.read(8192):
-                file_hash.update(chunk)
-
-            note.sha256_checksum = file_hash.hexdigest()
+        note.sha256_checksum = sha256_checksum(note.path)
 
         return True
 
@@ -284,7 +293,7 @@ class OrphanNoteGatherer(Gatherer):
         :return: True if the operation was successful, otherwise False
         """
         if len(note.backlinks) == 0:
-            index.orphans.append(note)
+            index.orphans.add(note)
 
         return True
 
