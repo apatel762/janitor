@@ -1,7 +1,5 @@
 import os
 from pathlib import Path
-from typing import Optional
-from typing import Set
 
 import typer
 
@@ -17,7 +15,6 @@ from .indexer import Index
 from .notes import Note
 from .pandocutils import maintain_backlinks
 from .typerutils import error
-from .typerutils import warn
 
 app = typer.Typer(
     help="A program for performing checks on, and enhancing, markdown notes."
@@ -69,11 +66,11 @@ def scan(
     # file mtime data to decide whether a file is new enough to bother
     # using the other gatherers on
     crawler.gatherers.append(ModifiedTimeGatherer())
-    crawler.gatherers.append(Sha256ChecksumGatherer())
     crawler.gatherers.append(NoteTitleGatherer())
     crawler.gatherers.append(ForwardLinkGatherer())
     crawler.gatherers.append(BacklinkGatherer())
     crawler.gatherers.append(OrphanNoteGatherer())
+    crawler.gatherers.append(Sha256ChecksumGatherer())
 
     crawler.go()
 
@@ -128,7 +125,7 @@ def apply(
             typer.confirm("Would you like to continue?", abort=True)
 
         # ensure that the notes haven't changed since the last scan
-        for note in index:
+        for note in index:  # type: Note
             checksum: str = sha256_checksum(note.path)
             if checksum != note.sha256_checksum:
                 typer.echo(
@@ -137,34 +134,14 @@ def apply(
                 raise typer.Exit(code=1)
 
         if refresh_all_backlinks:
-            for note in index:
+            for note in index:  # type: Note
                 maintain_backlinks(note)
         else:
-            # for better performance on larger collections of notes, we should
-            # only refresh the backlinks for notes that have changed since the
-            # last scan (& the notes that are referenced by the changed notes)
-            notes_to_refresh: Set[Note] = set()
-            for note in index:
-                if note.last_modified < index.scan_time:
-                    continue  # note hasn't changed since last scan
-                else:
-                    notes_to_refresh.add(note)
-                    for forward_link in note.forward_links:
-                        referenced_note: Optional[Note] = index.search_for_note(
-                            forward_link.destination_file_name
-                        )
-                        if note is not None:
-                            notes_to_refresh.add(referenced_note)
-                        else:
-                            typer.echo(
-                                warn(
-                                    f"{note} may have a broken link! "
-                                    f"Please fix and re-scan for the best results."
-                                )
-                            )
-
-            for note in notes_to_refresh:
+            for note in (note for note in index if note.needs_refresh):  # type: Note
                 maintain_backlinks(note)
+
+        # save the changes to the index now that we are done
+        index.dump(cache_dir)
 
     raise typer.Exit()
 

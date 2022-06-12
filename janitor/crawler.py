@@ -1,4 +1,3 @@
-import datetime
 import hashlib
 import os
 import time
@@ -87,20 +86,26 @@ class Crawler:
                 if (
                     not isinstance(gatherer, ModifiedTimeGatherer)
                     and not self.__is_fresh_index
-                    and note.last_modified < self.index.scan_time
+                    and note.last_modified < self.index.use_time
                 ):
                     continue
-                gatherer.apply(self.index, note)
+                else:
+                    gatherer.apply(self.index, note)
             t1 = time.time()
             typer.echo(f"  {repr(gatherer):<30} took {t1 - t0:<10.5f} seconds")
 
-        for broken_link in self.index.broken_links:
-            typer.echo(warn(f"broken link: {broken_link}."))
+        for note in self.index:
+            if self.__is_fresh_index or note.last_modified >= self.index.use_time:
+                # let the 'janitor apply' command know that we need
+                # to refresh the backlinks on this Note
+                note.needs_refresh = True
 
-        # record the current time into the index so that we can use it
-        # later on to avoid looking at notes that haven't been modified
-        # since the scan
-        self.index.scan_time = datetime.datetime.now(tz=datetime.timezone.utc)
+        for broken_link in self.index.broken_links:
+            typer.echo(
+                warn(
+                    f"broken link [{broken_link.origin_note_path.name}] -> [{broken_link.destination_file_name}]."
+                )
+            )
 
         # clear out the registered gatherers so that it doesn't look like
         # all the gatherers have run when we load the index up again later

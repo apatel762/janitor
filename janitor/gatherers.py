@@ -34,12 +34,18 @@ class Gatherer(ABC):
     that all the Gatherers will mutate the Note that you give it).
     """
 
-    def apply(self, index: Index, note: Note) -> bool:
+    def apply(self, index: Index, note: Note) -> None:
         if not self.validate_gathering_order(index):
             raise GathererError("Invalid gathering order on " + self.__class__.__name__)
 
         self.register_with_index(index)
-        return self.do_apply(index, note)
+
+        self.pre_apply(index, note)
+        self.do_apply(index, note)
+        self.post_apply(index, note)
+
+    def pre_apply(self, index: Index, note: Note) -> None:
+        pass
 
     @abstractmethod
     def do_apply(self, index: Index, note: Note) -> bool:
@@ -53,6 +59,9 @@ class Gatherer(ABC):
         :param note: A Markdown Note object to gather information from.
         """
         raise NotImplementedError("Use a subclass!")
+
+    def post_apply(self, index: Index, note: Note) -> None:
+        pass
 
     def validate_gathering_order(self, index: Index) -> bool:
         """
@@ -133,6 +142,15 @@ class ForwardLinkGatherer(Gatherer):
     def __init__(self) -> None:
         pass
 
+    def pre_apply(self, index: Index, note: Note) -> None:
+        """
+        Clear out the forward links so that we can re-generate them
+        reliably now without worrying about possible duplicates (where
+        the link origin and destination is the same but the context is
+        different).
+        """
+        note.forward_links = set()
+
     def do_apply(self, index: Index, note: Note) -> bool:
         """
         Scan the contents of a Note, find all Forward Links and store them
@@ -142,7 +160,7 @@ class ForwardLinkGatherer(Gatherer):
         :param note: The Note that you want to search.
         :return: True if any Forward Links were found, otherwise False.
         """
-        tree: Pandoc = parse_abstract_syntax_tree(note)
+        tree: Pandoc = parse_abstract_syntax_tree(note.path)
 
         for element, path in pandoc.iter(tree[1], path=True):
             # don't want to include any links that come after the Backlinks
@@ -170,6 +188,24 @@ class ForwardLinkGatherer(Gatherer):
             )
 
         return len(note.forward_links) > 0
+
+    def post_apply(self, index: Index, note: Note) -> None:
+        """
+        Clear out backlinks so that we can reliably reproduce them from
+        scratch later on without duplicates
+        """
+        note.backlinks = set()
+
+        # clear the backlinks of the notes that this one is pointing to
+        # AND mark those notes for refresh by bumping their last_modified
+        # value
+        for fl in note.forward_links:
+            n = index.search_for_note(file_name=fl.destination_file_name)
+            if n is None:
+                continue
+
+            n.backlinks = {bl for bl in n.backlinks if bl.origin_note_path != note.path}
+            n.last_modified = datetime.datetime.now(tz=datetime.timezone.utc)
 
     def validate_gathering_order(self, index: Index) -> bool:
         """
@@ -257,7 +293,7 @@ class NoteTitleGatherer(Gatherer):
         :param note: The Note that you want to calculate a checksum for.
         :return: True if the note title was found, otherwise False.
         """
-        tree: Pandoc = parse_abstract_syntax_tree(note)
+        tree: Pandoc = parse_abstract_syntax_tree(note.path)
 
         for element in pandoc.iter(tree[1]):
             # don't want to include any links that come after the Backlinks

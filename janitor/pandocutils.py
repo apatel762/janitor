@@ -1,4 +1,5 @@
 from functools import cache
+from os import PathLike
 from typing import Any
 from typing import Optional
 
@@ -12,7 +13,7 @@ from .notes import Note
 
 
 @cache
-def parse_abstract_syntax_tree(note: Note) -> Pandoc:
+def parse_abstract_syntax_tree(note_path: PathLike) -> Pandoc:
     """
     Uses the pandoc library to convert a given Markdown Note into a
     Pandoc-flavoured Markdown Abstract Syntax Tree.
@@ -20,10 +21,10 @@ def parse_abstract_syntax_tree(note: Note) -> Pandoc:
     NOTE: from the result, `tree[0]` will give you the metadata
     and `tree[1]` will give you the subtree with the actual text.
 
-    :param note: A Markdown Note object to parse.
+    :param note_path: The path to a Markdown Note to parse.
     :return: The Pandoc abstract syntax tree of the object.
     """
-    return pandoc.read(file=note.path, format="markdown")
+    return pandoc.read(file=note_path, format="markdown")
 
 
 def is_header(elt: Any, level: Optional[int] = None) -> bool:
@@ -80,7 +81,7 @@ def is_link_to_another_note(elt: Any, n: Note) -> bool:
 
 
 def has_backlinks_header(note: Note) -> bool:
-    tree: Pandoc = parse_abstract_syntax_tree(note)
+    tree: Pandoc = parse_abstract_syntax_tree(note.path)
 
     for element, path in pandoc.iter(tree[1], path=True):
         if is_backlinks_header(element):
@@ -94,7 +95,7 @@ def maintain_backlinks(note: Note) -> bool:
     :return: True if the backlinks were maintained successfully, otherwise False
     """
     typer.echo(f"Maintaining backlinks for {note}")
-    tree: Pandoc = parse_abstract_syntax_tree(note)
+    tree: Pandoc = parse_abstract_syntax_tree(note.path)
 
     # if there is already a backlinks section in the document, slice everything
     # from the backlinks section onwards out of the file; we will replace it
@@ -115,4 +116,8 @@ def maintain_backlinks(note: Note) -> bool:
 
     pandoc.write(doc=tree, file=note.path, format="markdown")
 
+    # need to make sure that we register this backlink maintenance in the
+    # Index, or else we will keep refreshing this note even when it doesn't
+    # need it
+    note.needs_refresh = False
     return True

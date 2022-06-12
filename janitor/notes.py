@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
 from os import PathLike
-from pathlib import Path
 from typing import List
 from typing import Optional
 from typing import Set
@@ -22,6 +21,9 @@ class Note:
         self.last_modified: Optional[datetime] = None
         self.backlinks: Set[NoteLink] = set()
         self.forward_links: Set[NoteLink] = set()
+
+        # stored during 'scan', used during 'apply'
+        self.needs_refresh = False
 
     @property
     def markdown_backlinks_block(self) -> str:
@@ -53,7 +55,7 @@ class NoteLink:
     """
 
     # The path to the Note from which this link originates
-    origin_note_path: Path
+    origin_note_path: PathLike
     # The title of the Note from which this link originates
     origin_note_title: str
     # The text in the origin Note that contains the link

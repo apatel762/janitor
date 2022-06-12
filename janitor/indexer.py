@@ -29,7 +29,8 @@ class Index:
 
     def __init__(self) -> None:
         self.__notes: List[Note] = []
-        self.scan_time: Optional[datetime.datetime] = None
+        # the time when the index was last used
+        self.use_time: Optional[datetime.datetime] = None
         self.registered_gatherers: Set[str] = set()
         self.broken_links: Set[NoteLink] = set()
         self.orphans: Set[Note] = set()
@@ -58,6 +59,7 @@ class Index:
         """
         Dump the indexed content to disk in the JSON format.
 
+        :param location: The folder that you want to put the dumped index in
         :return: True if the operation was successful, otherwise False.
         """
         if location is None:
@@ -67,6 +69,11 @@ class Index:
 
         target_location: PathLike = Path(os.path.join(location, "index.pickle"))
         typer.echo(f"Dumping {self} to: {target_location}")
+
+        # record the current time into the index so that we can use it
+        # later on to avoid looking at notes that haven't been modified
+        # since the scan
+        self.use_time = datetime.datetime.now(tz=datetime.timezone.utc)
 
         with open(target_location, "wb") as f:
             pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
