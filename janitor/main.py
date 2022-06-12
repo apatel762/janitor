@@ -1,3 +1,4 @@
+import datetime
 import os
 from pathlib import Path
 
@@ -128,9 +129,13 @@ def apply(
         for note in index:  # type: Note
             checksum: str = sha256_checksum(note.path)
             if checksum != note.sha256_checksum:
+                note.needs_refresh = True
+                note.last_modified = datetime.datetime.now(tz=datetime.timezone.utc)
                 typer.echo(
                     error(f"{note} has changed since the last scan! Please re-scan.")
                 )
+                # save the changes to the index now that we are done
+                index.dump(cache_dir)
                 raise typer.Exit(code=1)
 
         if refresh_all_backlinks:
