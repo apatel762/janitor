@@ -172,11 +172,26 @@ class ForwardLinkGatherer(Gatherer):
             if not is_link_to_another_note(element, note):
                 continue
 
-            # we want to also record the context of every link
-            # this means that we have to capture the content of the parent
-            # element for every link; we traverse up the tree by 'one' to do
-            # this (using `path[-1]` and then get contents from `[0]`).
-            link_context: str = "".join(pandoc.write(path[-1][0])).replace("\n", " ")
+            # we want to record the context of every link.
+            if len(path) <= 3:
+                # the path to the link being shorter than (or equal to) three hops
+                # means that this link is formatted normally.
+                # this means that we have to capture the content of the parent
+                # element for every link; we traverse up the tree by 'one' to do
+                # this (using `path[-1]` and then get contents from `[0]`).
+                link_context: str = "".join(pandoc.write(path[-1][0])).replace(
+                    "\n", " "
+                )
+            else:
+                # the path to the link being longer than three hops means that we
+                # are probably looking at a quoted link (i.e. a link with "double quotes"
+                # around it).
+                # for these elements, we want to traverse another two hops up the
+                # tree to get the full context; other than that, it's the same process
+                # as for the regular links
+                link_context: str = "".join(pandoc.write(path[-3][0])).replace(
+                    "\n", " "
+                )
 
             note.forward_links.add(
                 NoteLink(
