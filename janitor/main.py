@@ -46,10 +46,13 @@ def scan(
         resolve_path=True,
     ),
     assume_yes: bool = typer.Option(
-        False, "--assume-yes", help="Automatic 'Yes' to every prompt."
+        False, "--assume-yes", "-y", help="Automatic 'Yes' to every prompt."
     ),
     force_index_rebuild: bool = typer.Option(
-        False, "--force-index-rebuild", help="Rebuild the index entirely from scratch."
+        False,
+        "--force-index-rebuild",
+        "-f",
+        help="Rebuild the index entirely from scratch.",
     ),
 ) -> None:
     typer.echo(f"Will index folder: {folder}")
@@ -100,11 +103,12 @@ def apply(
         resolve_path=True,
     ),
     assume_yes: bool = typer.Option(
-        False, "--assume-yes", help="Automatic 'Yes' to every prompt."
+        False, "--assume-yes", "-y", help="Automatic 'Yes' to every prompt."
     ),
     refresh_all_backlinks: bool = typer.Option(
         False,
         "--refresh-all-backlinks",
+        "-f",
         help="Refresh all backlinks regardless of when the note was last updated.",
     ),
 ) -> None:
