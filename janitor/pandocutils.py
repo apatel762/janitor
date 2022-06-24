@@ -94,7 +94,6 @@ def maintain_backlinks(note: Note) -> bool:
     """
     :return: True if the backlinks were maintained successfully, otherwise False
     """
-    typer.echo(f"Maintaining backlinks for {note}")
     tree: Pandoc = parse_abstract_syntax_tree(note.path)
 
     # if there is already a backlinks section in the document, slice everything
@@ -103,8 +102,23 @@ def maintain_backlinks(note: Note) -> bool:
     if has_backlinks_header(note):
         for element, path in pandoc.iter(tree[1], path=True):
             if is_backlinks_header(element):
-                # slice the existing backlinks section out of the tree
-                tree[1] = tree[1][: path[0][1]]
+                backlinks_header_index: int = path[0][1]
+
+                cached_backlinks_block = pandoc.read(
+                    source=note.markdown_backlinks_block, format="markdown"
+                )[1]
+                current_backlinks_block = path[0][0][backlinks_header_index:]
+
+                if cached_backlinks_block == current_backlinks_block:
+                    # backlinks do not need updating, exit without clobbering the file at all
+                    typer.echo(f"{note} already up to date")
+                    return True
+                else:
+                    # slice the existing backlinks section out of the tree
+                    # this clobbers the note and bumps the file mtime, which will affect
+                    # indexing priority next time we scan (that's why we check above that
+                    # the backlinks have actually changed before we do this)
+                    tree[1] = tree[1][:backlinks_header_index]
 
     backlinks_block = pandoc.read(
         source=note.markdown_backlinks_block, format="markdown"
@@ -115,6 +129,7 @@ def maintain_backlinks(note: Note) -> bool:
         tree[1].append(elt)
 
     pandoc.write(doc=tree, file=note.path, format="markdown", options=["--wrap=none"])
+    typer.echo(f"{note} changed")
 
     # need to make sure that we register this backlink maintenance in the
     # Index, or else we will keep refreshing this note even when it doesn't

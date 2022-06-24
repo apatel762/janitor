@@ -139,7 +139,7 @@ def apply(
                     error(f"{note} has changed since the last scan! Please re-scan.")
                 )
                 # save the changes to the index now that we are done
-                index.dump(cache_dir)
+                index.dump(cache_dir, bump_use_time=False)
                 raise typer.Exit(code=1)
 
         if refresh_all_backlinks:
@@ -150,7 +150,7 @@ def apply(
                 maintain_backlinks(note)
 
         # save the changes to the index now that we are done
-        index.dump(cache_dir)
+        index.dump(cache_dir, bump_use_time=False)
 
     raise typer.Exit()
 

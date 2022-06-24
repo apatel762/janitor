@@ -58,11 +58,12 @@ class Index:
         except FileNotFoundError:
             return Index()
 
-    def dump(self, location: PathLike) -> bool:
+    def dump(self, location: PathLike, bump_use_time=True) -> bool:
         """
         Dump the indexed content to disk in the JSON format.
 
         :param location: The folder that you want to put the dumped index in
+        :param bump_use_time: If True, will update the use_time before dumping
         :return: True if the operation was successful, otherwise False.
         """
         if location is None:
@@ -76,7 +77,8 @@ class Index:
         # record the current time into the index so that we can use it
         # later on to avoid looking at notes that haven't been modified
         # since the scan
-        self.use_time = datetime.datetime.now(tz=datetime.timezone.utc)
+        if bump_use_time:
+            self.use_time = datetime.datetime.now(tz=datetime.timezone.utc)
 
         with open(target_location, "wb") as f:
             pickle.dump(self, f, pickle.HIGHEST_PROTOCOL)
