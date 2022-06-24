@@ -114,7 +114,7 @@ def maintain_backlinks(note: Note) -> bool:
     for elt in backlinks_block:
         tree[1].append(elt)
 
-    pandoc.write(doc=tree, file=note.path, format="markdown")
+    pandoc.write(doc=tree, file=note.path, format="markdown", options=["--wrap=none"])
 
     # need to make sure that we register this backlink maintenance in the
     # Index, or else we will keep refreshing this note even when it doesn't
