@@ -31,7 +31,7 @@ class Crawler:
             else Index.load(self.get_cache_directory(base_dir=crawl_dir))
         )
         self.gatherers: List[Gatherer] = []
-        self.__is_fresh_index: bool = should_rebuild
+        self.__is_fresh_index: bool = should_rebuild or len(self.index) == 0
 
     def validate_entry(self, entry: DirEntry) -> bool:
         return entry.is_file() and entry.name.endswith(".md")

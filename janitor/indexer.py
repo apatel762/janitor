@@ -52,8 +52,11 @@ class Index:
     @staticmethod
     def load(folder_containing_the_index: PathLike):
         file: Path = Path(os.path.join(folder_containing_the_index, "index.pickle"))
-        with open(file, "rb") as f:
-            return pickle.load(f)  # type: Index
+        try:
+            with open(file, "rb") as f:
+                return pickle.load(f)  # type: Index
+        except FileNotFoundError:
+            return Index()
 
     def dump(self, location: PathLike) -> bool:
         """
