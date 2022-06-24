@@ -1,0 +1,3 @@
+# Earthsea
+
+The Earthsea Cycle, also known as Earthsea, is a series of high fantasy books written by the American writer [Ursula K. Le Guin](note3.md). Beginning with [A Wizard of Earthsea](note1.md) (1968), The Tombs of Atuan, (1970) and The Farthest Shore (1972), the series was continued in Tehanu (1990), and Tales from Earthsea and The Other Wind (both 2001). In 2018, all the novels and short stories were published in a single volume, The Books of Earthsea: The Complete Illustrated Edition, with artwork by Charles Vess.
