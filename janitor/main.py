@@ -205,7 +205,7 @@ def publish(
     destination: Path = typer.Argument(
         Path(os.path.expanduser("~/Documents/Notes/.publish")),
         help="The folder that your published notes will be saved to.",
-        envvar="JANITOR_DESTINATION_FOLDER",
+        envvar="JANITOR_PUBLISH_FOLDER",
         exists=True,
         file_okay=False,
         dir_okay=True,
