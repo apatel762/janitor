@@ -78,8 +78,6 @@ def scan(
 
     crawler.go()
 
-    raise typer.Exit()
-
 
 @app.command(
     short_help="Put backlinks in notes if not present.",
@@ -151,6 +149,37 @@ def apply(
 
         # save the changes to the index now that we are done
         index.dump(cache_dir, bump_use_time=False)
+
+
+@app.command(
+    short_help="Maintain backlink structure across a folder of markdown notes.",
+    help=(
+        "This is a composite command that will run the 'scan' and 'apply' commands for you in one go."
+    ),
+)
+def maintain(
+    folder: Path = typer.Argument(
+        ...,
+        help="The folder containing all of your Markdown (*.md) notes.",
+        envvar="JANITOR_NOTES_FOLDER",
+        exists=True,
+        file_okay=False,
+        dir_okay=True,
+        readable=True,
+        resolve_path=True,
+    ),
+    assume_yes: bool = typer.Option(
+        False, "--assume-yes", "-y", help="Automatic 'Yes' to every prompt."
+    ),
+    force_refresh: bool = typer.Option(
+        False,
+        "--force-refresh",
+        "-f",
+        help="Ignore the cached index, if one exists.",
+    ),
+) -> None:
+    scan(folder, assume_yes, force_refresh)
+    apply(folder, assume_yes, force_refresh)
 
     raise typer.Exit()
 

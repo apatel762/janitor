@@ -111,7 +111,6 @@ def maintain_backlinks(note: Note) -> bool:
 
                 if cached_backlinks_block == current_backlinks_block:
                     # backlinks do not need updating, exit without clobbering the file at all
-                    typer.echo(f"{note} already up to date")
                     return True
                 else:
                     # slice the existing backlinks section out of the tree
@@ -129,7 +128,7 @@ def maintain_backlinks(note: Note) -> bool:
         tree[1].append(elt)
 
     pandoc.write(doc=tree, file=note.path, format="markdown", options=["--wrap=none"])
-    typer.echo(f"{note} changed")
+    typer.echo(f"{note} ({note.title}) changed")
 
     # need to make sure that we register this backlink maintenance in the
     # Index, or else we will keep refreshing this note even when it doesn't
