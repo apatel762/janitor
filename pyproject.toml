@@ -16,7 +16,7 @@ pandoc = "^2.2"
 typer = "^0.5.0"
 
 [tool.poetry.dev-dependencies]
-pre-commit = "^2.19.0"
+pre-commit = "^2.20.0"
 pytest = "^7.1.2"
 
 [build-system]
